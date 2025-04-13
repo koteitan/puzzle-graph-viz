@@ -1,7 +1,7 @@
 # What is Iwahswap
 Iwahswap is a puzzle developed in a creative exchange between Iwahiro (Hirokazu Iwasawa), Goetz Schwandtner, Bram Cohen and Oscar van Deventer.
-https://www.youtube.com/watch?v=3rFQOCd4fXE
-https://twistypuzzles.com/forum/viewtopic.php?t=40126%29
+- https://www.youtube.com/watch?v=3rFQOCd4fXE
+- https://twistypuzzles.com/forum/viewtopic.php?t=40126%29
 
 # What is this code
 This code is a python script to calculate the number of moves of Iwahswap.
