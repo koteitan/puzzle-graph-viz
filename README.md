@@ -1,21 +1,31 @@
-# this
-Python script to calculate the number of moves of Iwahswap.
-
-# Iwahswap
+# What is Iwahswap
 Iwahswap is a puzzle developed in a creative exchange between Iwahiro (Hirokazu Iwasawa), Goetz Schwandtner, Bram Cohen and Oscar van Deventer.
 https://www.youtube.com/watch?v=3rFQOCd4fXE
 https://twistypuzzles.com/forum/viewtopic.php?t=40126%29
 
-# requirements
+# What is this code
+This code is a python script to calculate the number of moves of Iwahswap.
+Add and Mul functions by sympy are useful to expand the recurrence relations.
+
+## expand.py
+expand.py is a useful library to observe the factorial patterns given by the of the recurrence relations.
+- apply_distributive_law*()
+  - apply the distributive law to the expression
+- pretty_print*()  
+  - pretty print the expression
+
+# Requirements
 - python
 - sympy
 
-# usage
+# Usage
 ```bash
 ./iwahswap.py <n> <k>
 ./hanoi.py <n> <n>
 ```
 where n is the number of pieces and k is the maximum number of the recurrence relations to be calculated.
+
+
 
 # example
 ```bash
