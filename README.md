@@ -3,16 +3,16 @@ Iwahswap is a puzzle developed in a creative exchange between Iwahiro (Hirokazu 
 - https://www.youtube.com/watch?v=3rFQOCd4fXE
 - https://twistypuzzles.com/forum/viewtopic.php?t=40126%29
 
-# What is this code
-This code is a python script to calculate the number of moves of Iwahswap.
-Add and Mul functions by sympy are useful to expand the recurrence relations.
+Iwahswap is said to have a hyper-exponential number of moves for n pieces to solve.
 
-## expand.py
-expand.py is a useful library to observe the factorial patterns given by the of the recurrence relations.
-- apply_distributive_law()
-  - apply the distributive law to the expression
-- pretty_print()
-  - pretty print the expression
+# What is this code
+I estimated the number of moves for k pieces in the all n pieces as follows.
+```
+M(1) =  n-1
+M(k) = (n-k)(M(k-1)+1)          if n-k is odd  and k>1
+M(k) = (n-k)(M(k-1)+1) + M(k-1) if n-k is even and k>1
+```
+This code is a python script to calculate them.
 
 # Requirements
 - python
@@ -24,8 +24,6 @@ expand.py is a useful library to observe the factorial patterns given by the of 
 ./hanoi.py <n> <n>
 ```
 where n is the number of pieces and k is the maximum number of the recurrence relations to be calculated.
-
-
 
 # example
 ```bash
@@ -61,4 +59,12 @@ M(3) = 2*2*1 + 2*1 + 1 = 7
 M(4) = 2*2*2*1 + 2*1 + 2*1 + 1 = 15
 M(5) = 2*2*2*2*1 + 2*1 + 2*1 + 2*1 + 1 = 31
 ```
+
+# Tips
+Add and Mul functions by sympy are useful to expand the recurrence relations to keep the factorial expressions. This code uses them to expand the expressions into standard form.
+
+## expand.py
+expand.py is a useful library to observe the factorial patterns given by the of the recurrence relations.
+- apply_distributive_law(): apply the distributive law to the expression
+- pretty_print(): pretty print the expression
 
