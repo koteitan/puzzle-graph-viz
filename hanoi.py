@@ -7,6 +7,7 @@ def build_M_all(n, k_max):
     M = {}
     M[1] = Integer(1)
     for k in range(2, k_max + 1):
+        # M(k) = 2M(k-1) + 1
         prev = M[k - 1]
         expr = Add(Mul(Integer(2), prev, evaluate=False), Integer(1), evaluate=False)
         M[k] = expr

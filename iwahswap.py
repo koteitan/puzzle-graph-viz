@@ -10,8 +10,10 @@ def build_M_all(n, k_max):
         prev = M[k - 1]
         nk = n - k
         if nk % 2 == 1:
-            expr = Mul(Integer(nk), Add(prev, Integer(1), evaluate=False), evaluate=False)
+            # M(k) = (n-k)(M(k-1)+1)          if n-k is odd  and k>1
+            expr =     Mul(Integer(nk), Add(prev, Integer(1), evaluate=False), evaluate=False)
         else:
+            # M(k) = (n-k)(M(k-1)+1) + M(k-2) if n-k is even and k>1
             expr = Add(Mul(Integer(nk), Add(prev, Integer(1), evaluate=False), evaluate=False), prev, evaluate=False)
         M[k] = expr
     return M
