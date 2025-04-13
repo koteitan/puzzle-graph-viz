@@ -6,7 +6,7 @@ Iwahswap is a puzzle developed in a creative exchange between Iwahiro (Hirokazu 
 Iwahswap is said to have a hyper-exponential number of moves for n pieces to solve.
 
 # What is this code
-I estimated the number of moves for k pieces in the all n pieces as follows.
+I estimated the number of moves for the k pieces alignment from one side to the other side in the all n pieces as follows.
 ```
 M(1) =  n-1
 M(k) = (n-k)(M(k-1)+1)          if n-k is odd  and k>1
