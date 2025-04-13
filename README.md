@@ -9,9 +9,9 @@ Add and Mul functions by sympy are useful to expand the recurrence relations.
 
 ## expand.py
 expand.py is a useful library to observe the factorial patterns given by the of the recurrence relations.
-- apply_distributive_law*()
+- apply_distributive_law()
   - apply the distributive law to the expression
-- pretty_print*()  
+- pretty_print*()
   - pretty print the expression
 
 # Requirements
