@@ -20,6 +20,8 @@
     - dial made by 6 pies
       - with the 6 digits of Game.rodtable[i]
       - Game.rodtable[i] is at the angle (i-Game.irod)*60-90 degree
+        - right side is 0 degree
+        - positive degree is counterclockwise
     - pivot:
       - triangle pointer to Game.irod
       - put below the dial

@@ -69,15 +69,15 @@ function drawBoard(x, y, width, height) {
         // Highlight movable cells
         const movable = getMovableCells();
         if (movable.includes(i)) {
-            ctx.strokeStyle = '#ffff00';
-            ctx.lineWidth = 4;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 5; 
             ctx.strokeRect(x + 2, cellY + 2, cellWidth - 4, cellHeight - 4);
         }
         
         // Draw piece label
         if (piece !== 0) {
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 30px Arial';
+            ctx.fillStyle = 'black';
+            ctx.font = 'bold 45px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(piece.toString(), x + cellWidth / 2, cellY + cellHeight / 2);
@@ -88,8 +88,8 @@ function drawBoard(x, y, width, height) {
 function drawRod(centerX, centerY, radius) {
     // Draw dial sections
     for (let i = 0; i < 6; i++) {
-        const startAngle = (i * 60 - 90) * Math.PI / 180;
-        const endAngle = ((i + 1) * 60 - 90) * Math.PI / 180;
+        const startAngle = (i * 60 + 90 - 30) * Math.PI / 180;
+        const endAngle   = (i * 60 + 90 + 30) * Math.PI / 180;
         
         // Determine the value at this position
         const rodIndex = (i - game.irod + 6) % 6;
@@ -111,15 +111,15 @@ function drawRod(centerX, centerY, radius) {
         
         // Highlight next movable sections
         if (i === 1 || i === 5) {
-            ctx.strokeStyle = '#ffff00';
-            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 5;
             ctx.stroke();
         }
         
         // Draw label
         ctx.save();
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 24px Arial';
+        ctx.fillStyle = 'black';
+        ctx.font = 'bold 32px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
@@ -131,11 +131,11 @@ function drawRod(centerX, centerY, radius) {
         ctx.restore();
     }
     
-    // Draw pivot (triangle pointer)
+    // Draw pivot (triangle pointer at bottom of dial)
     ctx.beginPath();
-    ctx.moveTo(centerX, centerY + radius + 10);
-    ctx.lineTo(centerX - 15, centerY + radius + 30);
-    ctx.lineTo(centerX + 15, centerY + radius + 30);
+    ctx.moveTo(centerX, centerY + radius - 10);
+    ctx.lineTo(centerX - 15, centerY + radius + 10);
+    ctx.lineTo(centerX + 15, centerY + radius + 10);
     ctx.closePath();
     
     ctx.fillStyle = '#fff';
