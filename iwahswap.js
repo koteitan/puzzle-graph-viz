@@ -33,7 +33,7 @@ const findzero=function(board) {
 }
 Game.prototype.init = function() {
   this.irod = rod2i(1);
-  this.board = new array(6);
+  this.board = new Array(6);
   for (var i = 0; i < this.board.length; i++) {
     this.board[i] = i;
   }
@@ -51,31 +51,34 @@ Game.prototype.move = function(dir) {
   switch(dir) {
     case 0: /* up 0 --------------------------- */
       if(i0 <= 0) return 0;
+      let game0 = this.clone();
       for(var i = i0; i > 0; i--) {
-        game.board[i] = b0[i-1];
+        game0.board[i] = b0[i-1];
       }
-      return game;
+      game0.board[0] = 0;
+      return game0;
     case 1: /* down 0 ------------------------- */
       if(i0 >= b0.length-1) return 0;
-      let game = this.clone();
+      let game1 = this.clone();
       for(var i = i0; i < b0.length-1; i++) {
-        game.board[i] = b0[i+1];
+        game1.board[i] = b0[i+1];
       }
-      return game;
+      game1.board[b0.length-1] = 0;
+      return game1;
     case 2: /* swap up ------------------------- */
       if(i0 >= b0.length-2) return 0;
       if(ribtable[this.irod][b0[i0+1]]!=2) return 0;
-      let game = this.clone();
-      game.board[i0  ] = b0[i0+2];
-      game.board[i0+2] = 0;
-      return game;
+      let game2 = this.clone();
+      game2.board[i0  ] = b0[i0+2];
+      game2.board[i0+2] = 0;
+      return game2;
     case 3: /* swap down ----------------------- */
       if(i0 <= 1) return 0;
       if(ribtable[this.irod][b0[i0-1]]!=2) return 0;
-      let game = this.clone();
-      game.board[i0  ] = b0[i0-2];
-      game.board[i0-2] = 0;
-      return game;
+      let game3 = this.clone();
+      game3.board[i0  ] = b0[i0-2];
+      game3.board[i0-2] = 0;
+      return game3;
   }
 }
 Game.prototype.checkmove = function(dir) {
