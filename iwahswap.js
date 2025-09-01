@@ -17,6 +17,8 @@ const piece2color=[
   "green", // 4
   "blue",  // 5
 ];
+const initboard=[0,1,2,3,4,5];
+const goalboard=[0,5,4,3,2,1];
 const rod2i=function(rod) {
   for (var i = 0; i < rodtable.length; i++) {
     if (rodtable[i] == rod) return i;
@@ -75,4 +77,25 @@ Game.prototype.move = function(dir) {
       game.board[i0-2] = 0;
       return game;
   }
+}
+Game.prototype.checkmove = function(dir) {
+  const b0 = this.board; 
+  const i0 = findzero(b0);
+  switch(dir) {
+    case 0: /* up 0 --------------------------- */
+      if(i0 <= 0) return false;
+      return true;
+    case 1: /* down 0 ------------------------- */
+      if(i0 >= b0.length-1) return false;
+      return true;
+    case 2: /* swap up ------------------------- */
+      if(i0 >= b0.length-2) return false;
+      if(ribtable[this.irod][b0[i0+1]]!=2) return false;
+      return true;
+    case 3: /* swap down ----------------------- */
+      if(i0 <= 1) return false;
+      if(ribtable[this.irod][b0[i0-1]]!=2) return false;
+      return true;
+  }
+  return false;
 }
