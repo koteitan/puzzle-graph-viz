@@ -89,17 +89,17 @@ function drawBoard(x, y, width, height) {
 function drawRod(centerX, centerY, radius) {
     // Draw dial sections
     for (let i = 0; i < 6; i++) {
-        const startAngle = (i * 60 + 90 - 30) * Math.PI / 180;
-        const endAngle   = (i * 60 + 90 + 30) * Math.PI / 180;
+        const startAngle = (i*60 - 90 - 30) * Math.PI / 180;
+        const endAngle   = (i*60 - 90 + 30) * Math.PI / 180;
         
         // Determine the value at this position
-        const rodIndex = (i - game.irod + 6) % 6;
+        const rodIndex = (i + game.irod + 6) % 6;
         const value = rodtable[rodIndex];
         
         // Draw pie section
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.arc(centerX, centerY, radius, -endAngle, -startAngle, false);
         ctx.closePath();
         
         // Color based on value
@@ -125,11 +125,18 @@ function drawRod(centerX, centerY, radius) {
         ctx.textBaseline = 'middle';
         
         const labelAngle = (startAngle + endAngle) / 2;
-        const labelX = centerX + Math.cos(labelAngle) * radius * 0.6;
-        const labelY = centerY + Math.sin(labelAngle) * radius * 0.6;
+        const sx = centerX + Math.cos(labelAngle) * radius * 0.6;
+        const sy = centerY - Math.sin(labelAngle) * radius * 0.6;
         
-        ctx.fillText(value.toString(), labelX, labelY);
+        ctx.fillText(value.toString(), Math.round(sx), Math.round(sy));
         ctx.restore();
+
+        console.log('i=',i);
+        console.log('rodIndex=',rodIndex);
+        console.log('vrod=',value);
+        console.log('(wx,wy)=(',canvas.width,',',canvas.height,')');
+        console.log('(cx,cy)=(',centerX,',',centerY,')');
+        console.log('(sx,sy)=(',sx,',',sy,')');
     }
     
     // Draw pivot (triangle pointer at bottom of dial)
@@ -235,26 +242,30 @@ function handleRodClick(x, y, centerX, centerY, radius) {
     const dy = y - centerY;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
-    if (distance > radius * 0.3 && distance < radius) {
-        let angle = Math.atan2(dy, dx) * 180 / Math.PI;
-        angle = (angle + 90 + 360) % 360;
+    if (distance < radius) {
+        let angle = Math.atan2(-dy, dx) * 180 / Math.PI;
+        angle = (angle+90+30+360) % 360;
         const section = Math.floor(angle / 60);
-        
         // Save current state for undo
         const prevState = game.clone();
-        
+         
         // Rotate to clicked section
+        let move = -1;
         if (section === 1) {
             // Clockwise
-            game.irod = (game.irod + 1) % 6;
-            history.push(prevState);
-            draw();
+            move = 4;
         } else if (section === 5) {
             // Counter-clockwise
-            game.irod = (game.irod + 5) % 6;
+            move = 5;
+        }
+        if(move!=-1){
+            game = game.move(move);
             history.push(prevState);
             draw();
         }
+        console.log('angle =', angle, 'section=', section, 
+          'game.move('+move+')', 'irod=', game.irod,
+          'rod=', rodtable[game.irod]);
     }
 }
 

@@ -77,16 +77,14 @@ Game.prototype.move = function(dir) {
       game.board[i0-2] = 0;
       return game;
     case 4: /* rod up -------------------------- */
-      if(this.irod >= rodtable.length-1) return 0;
       if(ribtable[this.irod+1][b0[i0]]!=1) return 0;
       game = this.clone();
-      game.irod++;
+      game.irod = (game.irod + 1 + 6)%6;
       return game;
     case 5: /* rod down ------------------------ */
-      if(this.irod <= 0) return 0;
       if(ribtable[this.irod-1][b0[i0]]!=1) return 0;
       game = this.clone();
-      game.irod--;
+      game.irod = (game.irod - 1 + 6)%6;
       return game;
   }
 }
