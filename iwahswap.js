@@ -48,37 +48,46 @@ Game.prototype.clone = function() {
 Game.prototype.move = function(dir) {
   const b0 = this.board; 
   const i0 = findzero(b0);
+  let game;
   switch(dir) {
     case 0: /* up 0 --------------------------- */
       if(i0 <= 0) return 0;
-      let game0 = this.clone();
-      for(var i = i0; i > 0; i--) {
-        game0.board[i] = b0[i-1];
-      }
-      game0.board[0] = 0;
-      return game0;
+      game = this.clone();
+      game.board[i0  ] = b0[i0-1];
+      game.board[i0-1] = 0;
+      return game;
     case 1: /* down 0 ------------------------- */
       if(i0 >= b0.length-1) return 0;
-      let game1 = this.clone();
-      for(var i = i0; i < b0.length-1; i++) {
-        game1.board[i] = b0[i+1];
-      }
-      game1.board[b0.length-1] = 0;
-      return game1;
+      game = this.clone();
+      game.board[i0  ] = b0[i0+1];
+      game.board[i0+1] = 0;
+      return game;
     case 2: /* swap up ------------------------- */
       if(i0 >= b0.length-2) return 0;
       if(ribtable[this.irod][b0[i0+1]]!=2) return 0;
-      let game2 = this.clone();
-      game2.board[i0  ] = b0[i0+2];
-      game2.board[i0+2] = 0;
-      return game2;
+      game = this.clone();
+      game.board[i0  ] = b0[i0+2];
+      game.board[i0+2] = 0;
+      return game;
     case 3: /* swap down ----------------------- */
       if(i0 <= 1) return 0;
       if(ribtable[this.irod][b0[i0-1]]!=2) return 0;
-      let game3 = this.clone();
-      game3.board[i0  ] = b0[i0-2];
-      game3.board[i0-2] = 0;
-      return game3;
+      game = this.clone();
+      game.board[i0  ] = b0[i0-2];
+      game.board[i0-2] = 0;
+      return game;
+    case 4: /* rod up -------------------------- */
+      if(this.irod >= rodtable.length-1) return 0;
+      if(ribtable[this.irod+1][b0[i0]]!=1) return 0;
+      game = this.clone();
+      game.irod++;
+      return game;
+    case 5: /* rod down ------------------------ */
+      if(this.irod <= 0) return 0;
+      if(ribtable[this.irod-1][b0[i0]]!=1) return 0;
+      game = this.clone();
+      game.irod--;
+      return game;
   }
 }
 Game.prototype.checkmove = function(dir) {

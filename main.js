@@ -45,8 +45,9 @@ function draw() {
     const boardWidth = canvas.width * BOARD_WIDTH_RATIO;
     const rodRadius = Math.min(canvas.width * ROD_WIDTH_RATIO, canvas.height * 0.4) / 2;
     
-    drawBoard(CELL_PADDING, CELL_PADDING, boardWidth, canvas.height - 2 * CELL_PADDING);
-    drawRod(canvas.width - rodRadius - CELL_PADDING * 2, canvas.height / 2, rodRadius);
+    // Draw rod on the left, board on the right
+    drawRod(rodRadius + CELL_PADDING * 2, canvas.height / 2, rodRadius);
+    drawBoard(canvas.width - boardWidth - CELL_PADDING, CELL_PADDING, boardWidth, canvas.height - 2 * CELL_PADDING);
 }
 
 function drawBoard(x, y, width, height) {
@@ -177,23 +178,27 @@ function handleCanvasClick(event) {
     
     const boardWidth = canvas.width * BOARD_WIDTH_RATIO;
     const rodRadius = Math.min(canvas.width * ROD_WIDTH_RATIO, canvas.height * 0.4) / 2;
-    const rodCenterX = canvas.width - rodRadius - CELL_PADDING * 2;
+    const rodCenterX = rodRadius + CELL_PADDING * 2;  // Rod is now on the left
     const rodCenterY = canvas.height / 2;
+    const boardX = canvas.width - boardWidth - CELL_PADDING;  // Board is now on the right
     
-    // Check if click is on board
-    if (x < boardWidth + CELL_PADDING * 2) {
-        handleBoardClick(x, y);
-    }
-    // Check if click is on rod
-    else {
+    // Check if click is on rod (left side)
+    if (x < rodCenterX + rodRadius) {
         handleRodClick(x, y, rodCenterX, rodCenterY, rodRadius);
+    }
+    // Check if click is on board (right side)
+    else if (x >= boardX) {
+        handleBoardClick(x, y, boardX);
     }
 }
 
-function handleBoardClick(x, y) {
+function handleBoardClick(x, y, boardX) {
     const boardWidth = canvas.width * BOARD_WIDTH_RATIO;
     const cellHeight = (canvas.height - 2 * CELL_PADDING) / 6;
     const blankIndex = findzero(game.board);
+    
+    // Check if click is within board bounds
+    if (x < boardX || x > boardX + boardWidth) return;
     
     const clickedCell = Math.floor((y - CELL_PADDING) / cellHeight);
     
