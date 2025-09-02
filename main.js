@@ -59,7 +59,7 @@ function drawBoard(x, y, width, height) {
         const piece = game.board[i];
         
         // Draw cell background
-        ctx.fillStyle = piece2color[piece];
+        ctx.fillStyle = label2color[Math.abs(piece)];
         ctx.fillRect(x, cellY, cellWidth, cellHeight);
         
         // Draw cell border
@@ -103,7 +103,7 @@ function drawRod(centerX, centerY, radius) {
         ctx.closePath();
         
         // Color based on value
-        ctx.fillStyle = getRodColor(value);
+        ctx.fillStyle = label2color[Math.abs(value)];
         ctx.fill();
         
         ctx.strokeStyle = '#333';
@@ -111,7 +111,9 @@ function drawRod(centerX, centerY, radius) {
         ctx.stroke();
         
         // Highlight next movable sections
-        if (i === 1 || i === 5) {
+        const ismovable4 = game.checkmove(4); // Clockwise
+        const ismovable5 = game.checkmove(5); // Counter-clockwise
+        if (i === 1 && ismovable4 || i === 5 && ismovable5) {
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 5;
             ctx.stroke();
@@ -128,10 +130,10 @@ function drawRod(centerX, centerY, radius) {
         const sx = centerX + Math.cos(labelAngle) * radius * 0.6;
         const sy = centerY - Math.sin(labelAngle) * radius * 0.6;
        
-        console.log('irod=',game.irod);
-        console.log('i=',i);
-        console.log('rodIndex=',rodIndex);
-        console.log('vrod=',value);
+        //console.log('irod=',game.irod);
+        //console.log('i=',i);
+        //console.log('rodIndex=',rodIndex);
+        //console.log('vrod=',value);
         
         ctx.fillText(value.toString(), Math.round(sx), Math.round(sy));
         ctx.restore();
@@ -153,18 +155,6 @@ function drawRod(centerX, centerY, radius) {
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 2;
     ctx.stroke();
-}
-
-function getRodColor(value) {
-    const colors = {
-        '-4': '#8b4513',
-        '-3': '#d2691e',
-        '-2': '#daa520',
-        '1': '#32cd32',
-        '2': '#00ced1',
-        '3': '#4169e1'
-    };
-    return colors[value] || '#888';
 }
 
 function getMovableCells() {
@@ -266,9 +256,9 @@ function handleRodClick(x, y, centerX, centerY, radius) {
             history.push(prevState);
             draw();
         }
-        console.log('angle =', angle, 'section=', section, 
-          'game.move('+move+')', 'irod=', game.irod,
-          'rod=', rodtable[game.irod]);
+        //console.log('angle =', angle, 'section=', section, 
+        //  'game.move('+move+')', 'irod=', game.irod,
+        //  'rod=', rodtable[game.irod]);
     }
 }
 

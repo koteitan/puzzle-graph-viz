@@ -1,15 +1,25 @@
 Game = function() {
 }
 const rodtable=[-4,-3,-2,1,2,3];
-const ribtable=[ //1=rib, 2=notch
-  [0,2,0,1,1,1], // -4
-  [0,2,0,0,1,1], // -3
-  [0,2,0,2,0,1], // -2
-  [0,2,2,2,2,0], // 1
-  [1,0,0,2,0,0], // 2
-  [1,1,0,0,2,0], // 3
+const ribtable=[
+//-4-3-2 1 2 3
+  [0,0,0,0,1,1], // 0
+  [0,0,0,0,0,2], // 1
+  [0,0,0,0,0,0], // 2
+  [3,0,0,0,0,0], // 3
+  [2,2,0,0,0,0], // 4
+  [1,1,1,0,0,0], // 5
 ];
-const piece2color=[
+const notchtable=[
+//-4-3-2 1 2 3
+  [0,0,0,0,0,0], // 0
+  [4,3,2,1,0,0], // 1
+  [0,0,0,1,0,0], // 2
+  [0,0,2,1,2,0], // 3
+  [0,0,0,1,0,3], // 4
+  [0,0,0,0,0,0], // 5
+];
+const label2color=[
   "black", // 0 (empty)
   "red",   // 1
   "orange",// 2
@@ -49,6 +59,10 @@ Game.prototype.move = function(dir) {
   const b0 = this.board; 
   const i0 = findzero(b0);
   let game;
+  let x;
+  let y;
+  let piece;
+  let ribpiece;
   switch(dir) {
     case 0: /* up 0 --------------------------- */
       if(i0 <= 0) return 0;
@@ -64,27 +78,43 @@ Game.prototype.move = function(dir) {
       return game;
     case 2: /* swap up ------------------------- */
       if(i0 >= b0.length-2) return 0;
-      if(ribtable[this.irod][b0[i0+1]]!=2) return 0;
+      x     = this.irod;
+      y     = i0+1;
+      piece = b0[y];
+      if(notchtable[y][x]!=piece) return 0;
       game = this.clone();
       game.board[i0  ] = b0[i0+2];
       game.board[i0+2] = 0;
       return game;
     case 3: /* swap down ----------------------- */
       if(i0 <= 1) return 0;
-      if(ribtable[this.irod][b0[i0-1]]!=2) return 0;
+      x     = this.irod;
+      y     = i0-1;
+      piece = b0[y];
+      if(notchtable[y][x]!=piece) return 0;
       game = this.clone();
       game.board[i0  ] = b0[i0-2];
       game.board[i0-2] = 0;
       return game;
     case 4: /* rod up -------------------------- */
-      if(ribtable[this.irod+1][b0[i0]]!=1) return 0;
+      x = (this.irod + 1 + 6)%6;
+      for(y=0;y<6;y++){
+        piece = b0[y];
+        ribpiece = ribtable[y][x];
+        if(piece!=0 && ribpiece!=0 && piece!=ribpiece) return 0;
+      }
       game = this.clone();
-      game.irod = (game.irod + 1 + 6)%6;
+      game.irod = x;
       return game;
     case 5: /* rod down ------------------------ */
-      if(ribtable[this.irod-1][b0[i0]]!=1) return 0;
+      x = (this.irod - 1 + 6)%6;
+      for(y=0;y<6;y++){
+        piece = b0[y];
+        ribpiece = ribtable[y][x];
+        if(piece!=0 && ribpiece!=0 && piece!=ribpiece) return 0;
+      }
       game = this.clone();
-      game.irod = (game.irod - 1 + 6)%6;
+      game.irod = x;
       return game;
   }
 }
