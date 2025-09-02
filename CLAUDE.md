@@ -8,6 +8,17 @@
 - iwahswap.js ... game system
 - \*.py ......... (no related to js)
 
+# layout on index.html
+- top: header
+- middle:
+  - top: canvas board
+    - left: rod
+    - right: board
+  - bottom: buttons
+    - top: undo button
+    - bottom: reset button
+- bottom: footer
+
 # components on index.html
 - header ... Iwahswap simulator
 - canvas board ... game board
