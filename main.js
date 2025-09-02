@@ -127,16 +127,18 @@ function drawRod(centerX, centerY, radius) {
         const labelAngle = (startAngle + endAngle) / 2;
         const sx = centerX + Math.cos(labelAngle) * radius * 0.6;
         const sy = centerY - Math.sin(labelAngle) * radius * 0.6;
+       
+        console.log('irod=',game.irod);
+        console.log('i=',i);
+        console.log('rodIndex=',rodIndex);
+        console.log('vrod=',value);
         
         ctx.fillText(value.toString(), Math.round(sx), Math.round(sy));
         ctx.restore();
 
-        console.log('i=',i);
-        console.log('rodIndex=',rodIndex);
-        console.log('vrod=',value);
-        console.log('(wx,wy)=(',canvas.width,',',canvas.height,')');
-        console.log('(cx,cy)=(',centerX,',',centerY,')');
-        console.log('(sx,sy)=(',sx,',',sy,')');
+        //console.log('(wx,wy)=(',canvas.width,',',canvas.height,')');
+        //console.log('(cx,cy)=(',centerX,',',centerY,')');
+        //console.log('(sx,sy)=(',sx,',',sy,')');
     }
     
     // Draw pivot (triangle pointer at bottom of dial)
@@ -259,7 +261,8 @@ function handleRodClick(x, y, centerX, centerY, radius) {
             move = 5;
         }
         if(move!=-1){
-            game = game.move(move);
+            let game2 = game.move(move);
+            if(game2) game = game2;
             history.push(prevState);
             draw();
         }

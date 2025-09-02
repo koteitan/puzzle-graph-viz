@@ -89,23 +89,6 @@ Game.prototype.move = function(dir) {
   }
 }
 Game.prototype.checkmove = function(dir) {
-  const b0 = this.board; 
-  const i0 = findzero(b0);
-  switch(dir) {
-    case 0: /* up 0 --------------------------- */
-      if(i0 <= 0) return false;
-      return true;
-    case 1: /* down 0 ------------------------- */
-      if(i0 >= b0.length-1) return false;
-      return true;
-    case 2: /* swap up ------------------------- */
-      if(i0 >= b0.length-2) return false;
-      if(ribtable[this.irod][b0[i0+1]]!=2) return false;
-      return true;
-    case 3: /* swap down ----------------------- */
-      if(i0 <= 1) return false;
-      if(ribtable[this.irod][b0[i0-1]]!=2) return false;
-      return true;
-  }
-  return false;
+  let game2 = this.move(dir);
+  return (game2 != 0);
 }
