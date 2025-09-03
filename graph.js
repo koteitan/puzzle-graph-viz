@@ -6,12 +6,79 @@ function GraphManager() {
   this.physicsInterval = null;
   this.solverInterval = null;
   this.visualizationInterval = null;
+  
+  // View state for zoom and pan
+  this.zoom = 1.0;
+  this.panX = 0;
+  this.panY = 0;
+  this.isDragging = false;
+  this.lastMouseX = 0;
+  this.lastMouseY = 0;
 }
 
 GraphManager.prototype.init = function(canvas, solver) {
   this.canvas = canvas;
   this.ctx = canvas.getContext('2d');
   this.solver = solver;
+  
+  // Add event listeners for mouse interaction
+  this.setupMouseEvents();
+}
+
+GraphManager.prototype.setupMouseEvents = function() {
+  // Mouse wheel zoom
+  this.canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const rect = this.canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+    const newZoom = Math.max(0.1, Math.min(5.0, this.zoom * zoomFactor));
+    
+    // Zoom towards mouse position
+    this.panX = mouseX - (mouseX - this.panX) * (newZoom / this.zoom);
+    this.panY = mouseY - (mouseY - this.panY) * (newZoom / this.zoom);
+    this.zoom = newZoom;
+    
+    this.draw();
+  });
+  
+  // Mouse drag pan
+  this.canvas.addEventListener('mousedown', (e) => {
+    this.isDragging = true;
+    this.lastMouseX = e.clientX;
+    this.lastMouseY = e.clientY;
+    this.canvas.style.cursor = 'grabbing';
+  });
+  
+  this.canvas.addEventListener('mousemove', (e) => {
+    if (this.isDragging) {
+      const deltaX = e.clientX - this.lastMouseX;
+      const deltaY = e.clientY - this.lastMouseY;
+      
+      this.panX += deltaX;
+      this.panY += deltaY;
+      
+      this.lastMouseX = e.clientX;
+      this.lastMouseY = e.clientY;
+      
+      this.draw();
+    }
+  });
+  
+  this.canvas.addEventListener('mouseup', () => {
+    this.isDragging = false;
+    this.canvas.style.cursor = 'grab';
+  });
+  
+  this.canvas.addEventListener('mouseleave', () => {
+    this.isDragging = false;
+    this.canvas.style.cursor = 'grab';
+  });
+  
+  // Set initial cursor
+  this.canvas.style.cursor = 'grab';
 }
 
 GraphManager.prototype.startSolver = function(game) {
@@ -51,7 +118,7 @@ GraphManager.prototype.startSolver = function(game) {
     }
   }, 100);  // Run solver every 100ms
   
-  // Visualize nodes faster (10 per second)
+  // Visualize nodes at faster speed (4 per second)
   this.visualizationInterval = setInterval(() => {
     const added = this.solver.addNextVisibleNode();
     console.log('Visible nodes:', this.solver.visibleGraph.size, '/', this.solver.graph.size);
@@ -60,7 +127,7 @@ GraphManager.prototype.startSolver = function(game) {
       this.visualizationInterval = null;
       console.log('Visualization complete');
     }
-  }, 100);  // Add 1 visible node per 100ms (10 per second)
+  }, 125);  // Add 1 visible node per 125ms (8 per second)
 }
 
 GraphManager.prototype.draw = function() {
@@ -68,26 +135,20 @@ GraphManager.prototype.draw = function() {
   
   if (!this.solver || this.solver.visibleGraph.size === 0) return;
   
+  // Apply zoom and pan transformation
+  this.ctx.save();
+  this.ctx.translate(this.panX, this.panY);
+  this.ctx.scale(this.zoom, this.zoom);
+  
   const centerX = this.canvas.width / 2;
   const centerY = this.canvas.height / 2;
   
-  // Calculate the furthest node from center (0,0)
-  let maxDistance = 1; // Minimum distance to avoid division by zero
-  this.solver.visibleGraph.forEach(node => {
-    const dist = Math.sqrt(node.x * node.x + node.y * node.y);
-    if (dist > maxDistance) {
-      maxDistance = dist;
-    }
-  });
-  
-  // Scale so the furthest node is at half canvas size (with some padding)
-  const padding = 20; // Padding from canvas edge
-  const targetRadius = Math.min(this.canvas.width / 2 - padding, this.canvas.height / 2 - padding);
-  const scale = targetRadius / maxDistance;
+  // Use fixed scale for manual control
+  const scale = 1.0;
   
   // Draw edges (only for visible nodes)
   this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-  this.ctx.lineWidth = 1;
+  this.ctx.lineWidth = 1 / this.zoom;  // Constant line width regardless of zoom
   
   this.solver.visibleGraph.forEach(node => {
     node.edgelist.forEach(neighbor => {
@@ -105,25 +166,44 @@ GraphManager.prototype.draw = function() {
   this.solver.visibleGraph.forEach(node => {
     const x = centerX + node.x * scale;
     const y = centerY + node.y * scale;
-    const radius = 5;
+    const radius = 2.5 / this.zoom;  // Constant radius regardless of zoom
     
     this.ctx.beginPath();
     this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
     
-    // Color based on node type
-    if (node.type === 'start') {
-      this.ctx.fillStyle = 'green';
-    } else if (node.type === 'goal') {
-      this.ctx.fillStyle = 'red';
-    } else {
-      this.ctx.fillStyle = 'white';
-    }
+    // Color based on current rod position using label2color
+    const rodValue = Math.abs(rodtable[node.game.irod]);
+    this.ctx.fillStyle = label2color[rodValue];
     
     this.ctx.fill();
     this.ctx.strokeStyle = '#333';
-    this.ctx.lineWidth = 1;
+    this.ctx.lineWidth = 1 / this.zoom;  // Constant line width regardless of zoom
     this.ctx.stroke();
   });
+  
+  // Draw start node as large green circle
+  if (this.solver.startNode && this.solver.visibleGraph.has(this.solver.startNode.hash)) {
+    const x = centerX + this.solver.startNode.x * scale;
+    const y = centerY + this.solver.startNode.y * scale;
+    
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, 8 / this.zoom, 0, 2 * Math.PI);  // Constant radius regardless of zoom
+    this.ctx.strokeStyle = 'green';
+    this.ctx.lineWidth = 3 / this.zoom;  // Constant line width regardless of zoom
+    this.ctx.stroke();
+  }
+  
+  // Draw goal node as large red circle
+  if (this.solver.goalNode && this.solver.visibleGraph.has(this.solver.goalNode.hash)) {
+    const x = centerX + this.solver.goalNode.x * scale;
+    const y = centerY + this.solver.goalNode.y * scale;
+    
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, 8 / this.zoom, 0, 2 * Math.PI);  // Constant radius regardless of zoom
+    this.ctx.strokeStyle = 'red';
+    this.ctx.lineWidth = 3 / this.zoom;  // Constant line width regardless of zoom
+    this.ctx.stroke();
+  }
   
   // Mark current state
   if (this.solver.currentStateNode) {
@@ -131,21 +211,31 @@ GraphManager.prototype.draw = function() {
     const y = centerY + this.solver.currentStateNode.y * scale;
     
     this.ctx.beginPath();
-    this.ctx.arc(x, y, 10, 0, 2 * Math.PI);
+    this.ctx.arc(x, y, 5 / this.zoom, 0, 2 * Math.PI);  // Constant radius regardless of zoom
     this.ctx.strokeStyle = 'yellow';
-    this.ctx.lineWidth = 3;
+    this.ctx.lineWidth = 3 / this.zoom;  // Constant line width regardless of zoom
     this.ctx.stroke();
   }
+  
+  // Restore canvas state
+  this.ctx.restore();
 }
 
 GraphManager.prototype.updatePhysics = function() {
   if (!this.solver || this.solver.visibleGraph.size === 0) return;
   
   const nodes = Array.from(this.solver.visibleGraph.values());
-  const REPULSION = 50;
-  const ATTRACTION = 0.0025;  // Reduced to 1/4 of original (0.01 -> 0.0025)
+  const REPULSION = 3000;  // 5x from 600 to 3000
+  const ATTRACTION = 0.0025;  // Already reduced to 1/4 of original
   const DAMPING = 0.9;
-  const CENTER_FORCE = 0.01;
+  const CENTER_FORCE = 0.00125;  // Reduced to half (0.0025 -> 0.00125)
+  
+  // Count nodes per depth level
+  const depthCounts = new Map();
+  nodes.forEach(node => {
+    const count = depthCounts.get(node.depth) || 0;
+    depthCounts.set(node.depth, count + 1);
+  });
   
   // Reset forces
   nodes.forEach(node => {
@@ -159,7 +249,14 @@ GraphManager.prototype.updatePhysics = function() {
       const dx = nodes[j].x - nodes[i].x;
       const dy = nodes[j].y - nodes[i].y;
       const dist = Math.sqrt(dx * dx + dy * dy) + 0.1;
-      const force = REPULSION / (dist * dist);
+      let force = REPULSION / (dist * dist);
+      
+      // Add extra repulsion for nodes at the same depth
+      if (nodes[i].depth === nodes[j].depth) {
+        const depthCount = depthCounts.get(nodes[i].depth) || 1;
+        const depthMultiplier = Math.sqrt(depthCount) * 0.5; // Scale with sqrt of node count
+        force += (REPULSION * depthMultiplier) / (dist * dist);
+      }
       
       nodes[i].fx -= force * dx / dist;
       nodes[i].fy -= force * dy / dist;
@@ -195,9 +292,22 @@ GraphManager.prototype.updatePhysics = function() {
     node.fx -= (node.x - 0 + cx) * CENTER_FORCE;
     node.fy -= (node.y - 0 + cy) * CENTER_FORCE;
     
+    // Depth-based downward gravity (reduced to half)
+    const DEPTH_GRAVITY = 0.0625; // Reduced to half (0.125 -> 0.0625)
+    node.fy += node.depth * DEPTH_GRAVITY;
+    
     // Update velocity
     node.vx = (node.vx + node.fx) * DAMPING;
     node.vy = (node.vy + node.fy) * DAMPING;
+    
+    // Apply velocity limits to prevent nodes from flying away
+    const MAX_VELOCITY = 50;  // Reduced to half (100 -> 50)
+    const currentSpeed = Math.sqrt(node.vx * node.vx + node.vy * node.vy);
+    if (currentSpeed > MAX_VELOCITY) {
+      const scale = MAX_VELOCITY / currentSpeed;
+      node.vx *= scale;
+      node.vy *= scale;
+    }
     
     // Update position
     node.x += node.vx;

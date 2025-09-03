@@ -1,13 +1,14 @@
 // Graph Node
-function GraphNode(game) {
+function GraphNode(game, depth = 0) {
   this.game = game;
   this.hash = game.hash();
   this.edgelist = [];
   this.type = 'normal'; // 'start', 'goal', 'normal'
+  this.depth = depth; // Distance from start node
   
-  // Physics properties
-  this.x = Math.random() * 400 - 200;
-  this.y = Math.random() * 400 - 200;
+  // Physics properties - position will be set when added to visible graph
+  this.x = 0;
+  this.y = 0;
   this.vx = 0;
   this.vy = 0;
   this.fx = 0;
@@ -35,8 +36,8 @@ Solver.prototype.init = function(initialGame) {
   this.visualizationQueue = [];
   this.running = false;
   
-  // Create start node
-  this.startNode = new GraphNode(initialGame.clone());
+  // Create start node with depth 0
+  this.startNode = new GraphNode(initialGame.clone(), 0);
   this.startNode.type = 'start';
   this.graph.set(this.startNode.hash, this.startNode);
   this.queue.push(this.startNode);
@@ -70,15 +71,15 @@ Solver.prototype.step = function() {
           existingNode.edgelist.push(node);
         }
       } else {
-        // Found a new node to add!
-        const nextNode = new GraphNode(nextGame);
+        // Found a new node to add! Set depth as current node's depth + 1
+        const nextNode = new GraphNode(nextGame, node.depth + 1);
         
         // Check if goal
         if (nextGame.isGoal()) {
           nextNode.type = 'goal';
           if (!this.goalNode) {
             this.goalNode = nextNode;
-            console.log('Goal found at depth:', this.visualizationQueue.length);
+            console.log('Goal found at depth:', nextNode.depth);
           }
         }
         
@@ -125,6 +126,21 @@ Solver.prototype.addNextVisibleNode = function() {
   }
   
   const node = this.visualizationQueue.shift();
+  
+  // Set spawn position: below the lowest visible node
+  let minY = 200; // Default spawn position
+  if (this.visibleGraph.size > 0) {
+    this.visibleGraph.forEach(existingNode => {
+      if (existingNode.y > minY) {
+        minY = existingNode.y;
+      }
+    });
+  }
+  
+  // Spawn below the lowest node with small offset
+  node.x = Math.random() * 400 - 200;  // Random horizontal position
+  node.y = minY + 10;  // Just 10 pixels below lowest node
+  
   this.visibleGraph.set(node.hash, node);
   
   return true;
