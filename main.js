@@ -38,15 +38,15 @@ window.addEventListener('load', () => {
 
 function resizeCanvas() {
     const gameArea = document.querySelector('.game-area');
-    const maxWidth = gameArea.clientWidth * 0.45;
-    const maxHeight = window.innerHeight * 0.6;
+    const maxWidth = gameArea.clientWidth * 0.675;  // Increased from 0.45 to 0.675 (1.5x)
+    const maxHeight = window.innerHeight * 0.9;  // Also increased height from 0.6 to 0.9 (1.5x)
     
-    canvas.width = Math.min(maxWidth, 600);
-    canvas.height = Math.min(maxHeight, 600);
+    canvas.width = Math.min(maxWidth, 900);  // Increased from 600 to 900 (1.5x)
+    canvas.height = Math.min(maxHeight, 900);  // Increased from 600 to 900 (1.5x)
     
     if (graphManager && graphManager.canvas) {
-        graphManager.canvas.width = Math.min(maxWidth, 600);
-        graphManager.canvas.height = Math.min(maxHeight, 600);
+        graphManager.canvas.width = Math.min(maxWidth, 900);  // Increased from 600 to 900 (1.5x)
+        graphManager.canvas.height = Math.min(maxHeight, 900);  // Increased from 600 to 900 (1.5x)
     }
 }
 

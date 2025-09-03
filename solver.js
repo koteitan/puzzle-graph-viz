@@ -128,18 +128,23 @@ Solver.prototype.addNextVisibleNode = function() {
   const node = this.visualizationQueue.shift();
   
   // Set spawn position: below the lowest visible node
-  let minY = 200; // Default spawn position
-  if (this.visibleGraph.size > 0) {
+  if (this.visibleGraph.size === 0) {
+    // First node (start node) - place at center
+    node.x = 0;
+    node.y = 0;
+  } else {
+    // Find lowest existing node
+    let minY = 0;
     this.visibleGraph.forEach(existingNode => {
       if (existingNode.y > minY) {
         minY = existingNode.y;
       }
     });
+    
+    // Spawn below the lowest node with random horizontal position
+    node.x = Math.random() * 400 - 200;
+    node.y = minY + 10;
   }
-  
-  // Spawn below the lowest node with small offset
-  node.x = Math.random() * 400 - 200;  // Random horizontal position
-  node.y = minY + 10;  // Just 10 pixels below lowest node
   
   this.visibleGraph.set(node.hash, node);
   

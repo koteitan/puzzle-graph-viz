@@ -8,12 +8,16 @@ function GraphManager() {
   this.visualizationInterval = null;
   
   // View state for zoom and pan
-  this.zoom = 1.0;
-  this.panX = 0;
-  this.panY = 0;
+  this.zoom = 0.1;  // Changed initial zoom to 0.1
+  this.panX = 0;  // Camera centered at (0,0)
+  this.panY = 0;  // Camera centered at (0,0)
   this.isDragging = false;
   this.lastMouseX = 0;
   this.lastMouseY = 0;
+  
+  // Touch/mobile state
+  this.touches = [];
+  this.lastTouchDistance = 0;
 }
 
 GraphManager.prototype.init = function(canvas, solver) {
@@ -34,7 +38,7 @@ GraphManager.prototype.setupMouseEvents = function() {
     const mouseY = e.clientY - rect.top;
     
     const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-    const newZoom = Math.max(0.1, Math.min(5.0, this.zoom * zoomFactor));
+    const newZoom = Math.max(0.02, Math.min(5.0, this.zoom * zoomFactor));
     
     // Zoom towards mouse position
     this.panX = mouseX - (mouseX - this.panX) * (newZoom / this.zoom);
@@ -79,6 +83,91 @@ GraphManager.prototype.setupMouseEvents = function() {
   
   // Set initial cursor
   this.canvas.style.cursor = 'grab';
+  
+  // Add touch events for mobile
+  this.setupTouchEvents();
+}
+
+GraphManager.prototype.setupTouchEvents = function() {
+  // Touch start
+  this.canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    this.touches = Array.from(e.touches);
+    
+    if (this.touches.length === 1) {
+      // Single touch - start pan
+      this.isDragging = true;
+      this.lastMouseX = this.touches[0].clientX;
+      this.lastMouseY = this.touches[0].clientY;
+    } else if (this.touches.length === 2) {
+      // Two touches - start pinch zoom
+      this.isDragging = false;
+      const dx = this.touches[1].clientX - this.touches[0].clientX;
+      const dy = this.touches[1].clientY - this.touches[0].clientY;
+      this.lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+    }
+  }, { passive: false });
+  
+  // Touch move
+  this.canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    this.touches = Array.from(e.touches);
+    
+    if (this.touches.length === 1 && this.isDragging) {
+      // Single touch pan
+      const deltaX = this.touches[0].clientX - this.lastMouseX;
+      const deltaY = this.touches[0].clientY - this.lastMouseY;
+      
+      this.panX += deltaX;
+      this.panY += deltaY;
+      
+      this.lastMouseX = this.touches[0].clientX;
+      this.lastMouseY = this.touches[0].clientY;
+      
+      this.draw();
+    } else if (this.touches.length === 2) {
+      // Pinch zoom
+      const dx = this.touches[1].clientX - this.touches[0].clientX;
+      const dy = this.touches[1].clientY - this.touches[0].clientY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (this.lastTouchDistance > 0) {
+        const rect = this.canvas.getBoundingClientRect();
+        const centerX = (this.touches[0].clientX + this.touches[1].clientX) / 2 - rect.left;
+        const centerY = (this.touches[0].clientY + this.touches[1].clientY) / 2 - rect.top;
+        
+        const zoomFactor = distance / this.lastTouchDistance;
+        const newZoom = Math.max(0.02, Math.min(5.0, this.zoom * zoomFactor));
+        
+        // Zoom towards touch center
+        this.panX = centerX - (centerX - this.panX) * (newZoom / this.zoom);
+        this.panY = centerY - (centerY - this.panY) * (newZoom / this.zoom);
+        this.zoom = newZoom;
+        
+        this.draw();
+      }
+      
+      this.lastTouchDistance = distance;
+    }
+  }, { passive: false });
+  
+  // Touch end
+  this.canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    this.touches = Array.from(e.touches);
+    
+    if (this.touches.length === 0) {
+      // All touches ended
+      this.isDragging = false;
+      this.lastTouchDistance = 0;
+    } else if (this.touches.length === 1) {
+      // Switch from pinch to pan
+      this.isDragging = true;
+      this.lastMouseX = this.touches[0].clientX;
+      this.lastMouseY = this.touches[0].clientY;
+      this.lastTouchDistance = 0;
+    }
+  }, { passive: false });
 }
 
 GraphManager.prototype.startSolver = function(game) {
@@ -127,7 +216,7 @@ GraphManager.prototype.startSolver = function(game) {
       this.visualizationInterval = null;
       console.log('Visualization complete');
     }
-  }, 125);  // Add 1 visible node per 125ms (8 per second)
+  }, 5);  // Add 1 visible node per 5ms (200 per second)
 }
 
 GraphManager.prototype.draw = function() {
@@ -135,13 +224,14 @@ GraphManager.prototype.draw = function() {
   
   if (!this.solver || this.solver.visibleGraph.size === 0) return;
   
-  // Apply zoom and pan transformation
+  // Apply transformation: center -> pan -> zoom
   this.ctx.save();
-  this.ctx.translate(this.panX, this.panY);
-  this.ctx.scale(this.zoom, this.zoom);
+  this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);  // Move origin to screen center
+  this.ctx.translate(this.panX, this.panY);  // Apply pan offset
+  this.ctx.scale(this.zoom, this.zoom);  // Apply zoom
   
-  const centerX = this.canvas.width / 2;
-  const centerY = this.canvas.height / 2;
+  const centerX = 0;  // Now (0,0) in graph coordinates is at screen center
+  const centerY = 0;
   
   // Use fixed scale for manual control
   const scale = 1.0;

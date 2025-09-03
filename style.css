@@ -52,12 +52,12 @@ header h1 {
 
 #board {
     flex: 1;
-    max-width: 45%;
+    max-width: 67.5%;  /* Increased from 45% to 67.5% (1.5x) */
 }
 
 #graph {
     flex: 1;
-    max-width: 45%;
+    max-width: 67.5%;  /* Increased from 45% to 67.5% (1.5x) */
 }
 
 .controls {
