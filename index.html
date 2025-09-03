@@ -12,11 +12,15 @@
     </header>
     
     <div class="game-container">
-        <canvas id="board"></canvas>
+        <div class="game-area">
+            <canvas id="board"></canvas>
+            <canvas id="graph"></canvas>
+        </div>
         
         <div class="controls">
             <button id="undoButton">Undo</button>
             <button id="resetButton">Reset</button>
+            <button id="solverButton">Solver</button>
         </div>
     </div>
     
@@ -31,6 +35,8 @@
     </footer>
     
     <script src="iwahswap.js"></script>
+    <script src="solver.js"></script>
+    <script src="graph.js"></script>
     <script src="main.js"></script>
 </body>
 </html>

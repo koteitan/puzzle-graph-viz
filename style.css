@@ -31,15 +31,33 @@ header h1 {
     align-items: center;
     justify-content: center;
     padding: 20px;
+    width: 100%;
 }
 
-#board {
+.game-area {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 1400px;
+    justify-content: center;
+}
+
+#board, #graph {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     cursor: pointer;
-    max-width: 90vw;
     max-height: 60vh;
+}
+
+#board {
+    flex: 1;
+    max-width: 45%;
+}
+
+#graph {
+    flex: 1;
+    max-width: 45%;
 }
 
 .controls {

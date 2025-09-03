@@ -122,3 +122,16 @@ Game.prototype.checkmove = function(dir) {
   let game2 = this.move(dir);
   return (game2 != 0);
 }
+
+Game.prototype.hash = function() {
+  return this.board.join(',') + '-' + this.irod;
+}
+
+Game.prototype.isGoal = function() {
+  for (let i = 0; i < 6; i++) {
+    if (this.board[i] !== goalboard[i]) {
+      return false;
+    }
+  }
+  return true;
+}

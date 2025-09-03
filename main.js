@@ -3,6 +3,7 @@ let game;
 let canvas;
 let ctx;
 let history = [];
+let graphManager = null;
 
 // Drawing parameters
 const CELL_PADDING = 10;
@@ -17,6 +18,10 @@ window.addEventListener('load', () => {
     game = new Game();
     game.init();
     
+    // Initialize graph manager
+    graphManager = new GraphManager();
+    graphManager.init(document.getElementById('graph'), new Solver());
+    
     resizeCanvas();
     draw();
     
@@ -24,6 +29,7 @@ window.addEventListener('load', () => {
     canvas.addEventListener('click', handleCanvasClick);
     document.getElementById('undoButton').addEventListener('click', handleUndo);
     document.getElementById('resetButton').addEventListener('click', handleReset);
+    document.getElementById('solverButton').addEventListener('click', handleSolver);
     window.addEventListener('resize', () => {
         resizeCanvas();
         draw();
@@ -31,12 +37,17 @@ window.addEventListener('load', () => {
 });
 
 function resizeCanvas() {
-    const container = document.querySelector('.game-container');
-    const maxWidth = container.clientWidth * 0.9;
+    const gameArea = document.querySelector('.game-area');
+    const maxWidth = gameArea.clientWidth * 0.45;
     const maxHeight = window.innerHeight * 0.6;
     
-    canvas.width = Math.min(maxWidth, 800);
+    canvas.width = Math.min(maxWidth, 600);
     canvas.height = Math.min(maxHeight, 600);
+    
+    if (graphManager && graphManager.canvas) {
+        graphManager.canvas.width = Math.min(maxWidth, 600);
+        graphManager.canvas.height = Math.min(maxHeight, 600);
+    }
 }
 
 function draw() {
@@ -48,6 +59,11 @@ function draw() {
     // Draw rod on the left, board on the right
     drawRod(rodRadius + CELL_PADDING * 2, canvas.height / 2, rodRadius);
     drawBoard(canvas.width - boardWidth - CELL_PADDING, CELL_PADDING, boardWidth, canvas.height - 2 * CELL_PADDING);
+    
+    // Draw graph
+    if (graphManager) {
+        graphManager.draw();
+    }
 }
 
 function drawBoard(x, y, width, height) {
@@ -224,6 +240,9 @@ function handleBoardClick(x, y, boardX) {
     
     if (moved && game) {
         history.push(prevState);
+        if (graphManager) {
+            graphManager.updateCurrentState(game);
+        }
         draw();
         checkGoal();
     }
@@ -252,9 +271,14 @@ function handleRodClick(x, y, centerX, centerY, radius) {
         }
         if(move!=-1){
             let game2 = game.move(move);
-            if(game2) game = game2;
-            history.push(prevState);
-            draw();
+            if(game2) {
+                game = game2;
+                history.push(prevState);
+                if (graphManager) {
+                    graphManager.updateCurrentState(game);
+                }
+                draw();
+            }
         }
         //console.log('angle =', angle, 'section=', section, 
         //  'game.move('+move+')', 'irod=', game.irod,
@@ -265,6 +289,9 @@ function handleRodClick(x, y, centerX, centerY, radius) {
 function handleUndo() {
     if (history.length > 0) {
         game = history.pop();
+        if (graphManager) {
+            graphManager.updateCurrentState(game);
+        }
         draw();
     }
 }
@@ -276,6 +303,9 @@ function handleReset() {
     }
     
     game.init();
+    if (graphManager) {
+        graphManager.updateCurrentState(game);
+    }
     draw();
 }
 
@@ -292,5 +322,11 @@ function checkGoal() {
         setTimeout(() => {
             alert('Goal!');
         }, 100);
+    }
+}
+
+function handleSolver() {
+    if (graphManager) {
+        graphManager.startSolver(game);
     }
 }

@@ -11,12 +11,15 @@
 # layout on index.html
 - top: header
 - middle:
-  - top: canvas board
-    - left: rod
-    - right: board
+  - top: 
+    - left:canvas board
+      - left: rod
+      - right: board
+    - right: graph board
   - bottom: buttons
     - top: undo button
-    - bottom: reset button
+    - medium: reset button
+    - bottom: solver button
 - bottom: footer
 
 # components on index.html
@@ -38,6 +41,7 @@
       - put below the dial
 - undo button ... undo the last move (Game.undo())
 - reset button ... reset the game to initial state (Game.init())
+- solver button ... start solver (see below)
 - address footer:
   - Iwahswap is a puzzle developed in a creative exchange between Iwahiro (Hirokazu Iwasawa), Goetz Schwandtner, Bram Cohen and Oscar van Deventer.
     - https://www.youtube.com/watch?v=3rFQOCd4fXE
@@ -62,4 +66,44 @@
 - don't git commit. I will git commit.
 - Talk to me in Japanese.
 - The languange of the code comments and site are English.
+
+# solver and graph
+- The solver explores the state space by breadth first search from the initial state and makes a graph of states.
+- The graph consists of nodes.
+- The nodes have edgelist, which is a list to the pointers to the nodes reachable by one move.
+- The solver adds nodes to the graph until there is no new node to add.
+- The solver adds the edges to the edgelist of the nodes.
+- The edges are non-directional. Therefore, the edges are added to both nodes when a new node is added.
+- The nodes has their type, start, goal, or normal.
+
+# drawing of graph
+- The graph is drawn on the right side of the canvas board.
+- The nodes are drawn as circles.
+- The edges are drawn as lines between the circles.
+- The start node, goal node, normal nodes are drawn in green, red, white respectively.
+- The graph has the physical engine to layout the nodes.
+- The nodes repel each other.
+- The nodes are attracted to the nodes in their edgelist.
+- The node gravity center is always re-centered to the center of the graph area.
+- The graph width and height are always resized with the canvas size.
+- The graph structure and the physical positions are updated asynchronously and simaultaneously with the adding of nodes and edges by solver.
+
+# game play and the graph
+- The game state is marked by a circle on the node of the graph.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
