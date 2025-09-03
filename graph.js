@@ -40,10 +40,16 @@ GraphManager.prototype.setupMouseEvents = function() {
     const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
     const newZoom = Math.max(0.02, Math.min(5.0, this.zoom * zoomFactor));
     
-    // Zoom towards mouse position
-    this.panX = mouseX - (mouseX - this.panX) * (newZoom / this.zoom);
-    this.panY = mouseY - (mouseY - this.panY) * (newZoom / this.zoom);
+    // Convert mouse position to world coordinates before zoom
+    const worldX = (mouseX - this.canvas.width / 2 - this.panX) / this.zoom;
+    const worldY = (mouseY - this.canvas.height / 2 - this.panY) / this.zoom;
+    
+    // Update zoom
     this.zoom = newZoom;
+    
+    // Convert world coordinates back to screen coordinates and adjust pan
+    this.panX = mouseX - this.canvas.width / 2 - worldX * this.zoom;
+    this.panY = mouseY - this.canvas.height / 2 - worldY * this.zoom;
     
     this.draw();
   });
@@ -139,10 +145,16 @@ GraphManager.prototype.setupTouchEvents = function() {
         const zoomFactor = distance / this.lastTouchDistance;
         const newZoom = Math.max(0.02, Math.min(5.0, this.zoom * zoomFactor));
         
-        // Zoom towards touch center
-        this.panX = centerX - (centerX - this.panX) * (newZoom / this.zoom);
-        this.panY = centerY - (centerY - this.panY) * (newZoom / this.zoom);
+        // Convert touch center to world coordinates before zoom
+        const worldX = (centerX - this.canvas.width / 2 - this.panX) / this.zoom;
+        const worldY = (centerY - this.canvas.height / 2 - this.panY) / this.zoom;
+        
+        // Update zoom
         this.zoom = newZoom;
+        
+        // Convert world coordinates back to screen coordinates and adjust pan
+        this.panX = centerX - this.canvas.width / 2 - worldX * this.zoom;
+        this.panY = centerY - this.canvas.height / 2 - worldY * this.zoom;
         
         this.draw();
       }
@@ -199,7 +211,7 @@ GraphManager.prototype.startSolver = function(game) {
   // Run solver fast (explore all states quickly)
   this.solverInterval = setInterval(() => {
     const steps = this.solver.run(100);  // Run many steps at once
-    console.log('Solver explored:', this.solver.graph.size, 'total nodes, queue:', this.solver.queue.length, 'visualization queue:', this.solver.visualizationQueue.length);
+    // console.log('Solver explored:', this.solver.graph.size, 'total nodes, queue:', this.solver.queue.length, 'visualization queue:', this.solver.visualizationQueue.length);
     if (steps === 0) {
       clearInterval(this.solverInterval);
       this.solverInterval = null;
@@ -210,7 +222,7 @@ GraphManager.prototype.startSolver = function(game) {
   // Visualize nodes at faster speed (4 per second)
   this.visualizationInterval = setInterval(() => {
     const added = this.solver.addNextVisibleNode();
-    console.log('Visible nodes:', this.solver.visibleGraph.size, '/', this.solver.graph.size);
+    // console.log('Visible nodes:', this.solver.visibleGraph.size, '/', this.solver.graph.size);
     if (!added && !this.solverInterval) {
       clearInterval(this.visualizationInterval);
       this.visualizationInterval = null;

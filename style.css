@@ -47,7 +47,7 @@ header h1 {
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     cursor: pointer;
-    max-height: 60vh;
+    max-height: 80vh;  /* Increased from 60vh to 80vh for more height */
 }
 
 #board {
@@ -58,6 +58,29 @@ header h1 {
 #graph {
     flex: 1;
     max-width: 67.5%;  /* Increased from 45% to 67.5% (1.5x) */
+    display: none;  /* Initially hidden */
+}
+
+/* When graph is visible, make each canvas 50% of screen width */
+.game-area.graph-visible #board,
+.game-area.graph-visible #graph {
+    display: block;
+    flex: 1;
+    max-width: 50%;  /* Each canvas takes 50% of screen width */
+    width: 50%;
+}
+
+/* When graph is hidden, don't use flex for board to preserve aspect ratio */
+.game-area:not(.graph-visible) {
+    justify-content: center;
+}
+
+.game-area:not(.graph-visible) #board {
+    flex: none;  /* Remove flex stretching */
+    margin: 0 auto;
+    width: auto;  /* Let canvas maintain its natural size */
+    height: auto;
+    max-width: 100%;  /* Can use full width when alone */
 }
 
 .controls {
@@ -95,11 +118,12 @@ footer {
     text-align: center;
     background: rgba(0, 0, 0, 0.2);
     width: 100%;
+    font-size: 0.7em;  /* 0.7x smaller font size */
 }
 
 footer p {
-    margin: 10px 0;
-    line-height: 1.6;
+    margin: 5px 0;  /* Reduced margin from 10px to 5px */
+    line-height: 1.3;  /* Reduced line height */
 }
 
 footer a {
@@ -119,15 +143,17 @@ footer a:hover {
     }
     
     .controls {
-        flex-direction: column;
-        gap: 15px;
+        flex-direction: row;  /* Keep buttons horizontal */
+        gap: 10px;  /* Reduced gap for mobile */
+        justify-content: center;
     }
     
     button {
-        width: 200px;
-    }
-    
-    footer {
-        font-size: 0.9em;
+        width: auto;  /* Auto width instead of fixed 200px */
+        padding: 8px 15px;  /* Smaller padding for mobile */
+        font-size: 0.9em;  /* Smaller font size */
+        min-width: 60px;  /* Minimum width to ensure readability */
+        flex: 1;  /* Equal width distribution */
+        max-width: 100px;  /* Maximum width to keep them small */
     }
 }
