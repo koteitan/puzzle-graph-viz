@@ -18,6 +18,8 @@ function GraphManager() {
   // Touch/mobile state
   this.touches = [];
   this.lastTouchDistance = 0;
+  this.lastTouchCenterX = 0;
+  this.lastTouchCenterY = 0;
 }
 
 GraphManager.prototype.init = function(canvas, solver) {
@@ -106,11 +108,15 @@ GraphManager.prototype.setupTouchEvents = function() {
       this.lastMouseX = this.touches[0].clientX;
       this.lastMouseY = this.touches[0].clientY;
     } else if (this.touches.length === 2) {
-      // Two touches - start pinch zoom
+      // Two touches - start pinch zoom and prepare for two-finger pan
       this.isDragging = false;
       const dx = this.touches[1].clientX - this.touches[0].clientX;
       const dy = this.touches[1].clientY - this.touches[0].clientY;
       this.lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+      
+      // Store initial center position for two-finger panning
+      this.lastTouchCenterX = (this.touches[0].clientX + this.touches[1].clientX) / 2;
+      this.lastTouchCenterY = (this.touches[0].clientY + this.touches[1].clientY) / 2;
     }
   }, { passive: false });
   
@@ -132,16 +138,19 @@ GraphManager.prototype.setupTouchEvents = function() {
       
       this.draw();
     } else if (this.touches.length === 2) {
-      // Pinch zoom
+      // Two-finger operations: pinch zoom and pan
       const dx = this.touches[1].clientX - this.touches[0].clientX;
       const dy = this.touches[1].clientY - this.touches[0].clientY;
       const distance = Math.sqrt(dx * dx + dy * dy);
+      const currentCenterX = (this.touches[0].clientX + this.touches[1].clientX) / 2;
+      const currentCenterY = (this.touches[0].clientY + this.touches[1].clientY) / 2;
       
       if (this.lastTouchDistance > 0) {
         const rect = this.canvas.getBoundingClientRect();
-        const centerX = (this.touches[0].clientX + this.touches[1].clientX) / 2 - rect.left;
-        const centerY = (this.touches[0].clientY + this.touches[1].clientY) / 2 - rect.top;
+        const centerX = currentCenterX - rect.left;
+        const centerY = currentCenterY - rect.top;
         
+        // Handle pinch zoom
         const zoomFactor = distance / this.lastTouchDistance;
         const newZoom = Math.max(0.02, Math.min(5.0, this.zoom * zoomFactor));
         
@@ -156,10 +165,22 @@ GraphManager.prototype.setupTouchEvents = function() {
         this.panX = centerX - this.canvas.width / 2 - worldX * this.zoom;
         this.panY = centerY - this.canvas.height / 2 - worldY * this.zoom;
         
+        // Handle two-finger panning
+        if (this.lastTouchCenterX !== 0 && this.lastTouchCenterY !== 0) {
+          const centerDeltaX = currentCenterX - this.lastTouchCenterX;
+          const centerDeltaY = currentCenterY - this.lastTouchCenterY;
+          
+          // Add panning movement
+          this.panX += centerDeltaX;
+          this.panY += centerDeltaY;
+        }
+        
         this.draw();
       }
       
       this.lastTouchDistance = distance;
+      this.lastTouchCenterX = currentCenterX;
+      this.lastTouchCenterY = currentCenterY;
     }
   }, { passive: false });
   
@@ -172,12 +193,16 @@ GraphManager.prototype.setupTouchEvents = function() {
       // All touches ended
       this.isDragging = false;
       this.lastTouchDistance = 0;
+      this.lastTouchCenterX = 0;
+      this.lastTouchCenterY = 0;
     } else if (this.touches.length === 1) {
       // Switch from pinch to pan
       this.isDragging = true;
       this.lastMouseX = this.touches[0].clientX;
       this.lastMouseY = this.touches[0].clientY;
       this.lastTouchDistance = 0;
+      this.lastTouchCenterX = 0;
+      this.lastTouchCenterY = 0;
     }
   }, { passive: false });
 }
