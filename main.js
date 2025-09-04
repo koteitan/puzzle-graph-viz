@@ -5,6 +5,8 @@ let ctx;
 let history = [];
 let graphManager = null;
 let debugTextarea = null;
+let jumpMode = false;
+let dragMode = false;
 
 // Debug logging function
 function debugLog(message) {
@@ -33,6 +35,24 @@ window.addEventListener('load', () => {
     graphManager = new GraphManager();
     graphManager.init(document.getElementById('graph'), new Solver());
     
+    // Set jump callback to handle jumping to nodes
+    graphManager.setJumpCallback((gameState) => {
+        // Save current state for undo
+        history.push(game.clone());
+        
+        // Jump to the selected node's game state
+        game = gameState.clone();
+        
+        // Update display
+        draw();
+        checkGoal();
+        
+        // Update graph visualization
+        if (graphManager) {
+            graphManager.updateCurrentState(game);
+        }
+    });
+    
     resizeCanvas();
     draw();
     
@@ -45,6 +65,8 @@ window.addEventListener('load', () => {
     document.getElementById('undoButton').addEventListener('click', handleUndo);
     document.getElementById('resetButton').addEventListener('click', handleReset);
     document.getElementById('solverButton').addEventListener('click', handleSolver);
+    document.getElementById('jumpButton').addEventListener('click', handleJumpToggle);
+    document.getElementById('dragButton').addEventListener('click', handleDragToggle);
     window.addEventListener('resize', () => {
         resizeCanvas();
         draw();
@@ -483,6 +505,56 @@ function handleSolver() {
     // Resize canvases for new layout
     resizeCanvas();
     draw();
+}
+
+function handleJumpToggle() {
+    jumpMode = !jumpMode;
+    dragMode = false; // Turn off drag mode when jump mode is turned on
+    
+    const jumpButton = document.getElementById('jumpButton');
+    const dragButton = document.getElementById('dragButton');
+    
+    if (jumpMode) {
+        jumpButton.style.backgroundColor = '#4CAF50';
+        jumpButton.style.color = 'white';
+    } else {
+        jumpButton.style.backgroundColor = '';
+        jumpButton.style.color = '';
+    }
+    
+    // Reset drag button appearance
+    dragButton.style.backgroundColor = '';
+    dragButton.style.color = '';
+    
+    // Update graph manager mode
+    if (graphManager) {
+        graphManager.setMode(jumpMode ? 'jump' : 'normal');
+    }
+}
+
+function handleDragToggle() {
+    dragMode = !dragMode;
+    jumpMode = false; // Turn off jump mode when drag mode is turned on
+    
+    const jumpButton = document.getElementById('jumpButton');
+    const dragButton = document.getElementById('dragButton');
+    
+    if (dragMode) {
+        dragButton.style.backgroundColor = '#4CAF50';
+        dragButton.style.color = 'white';
+    } else {
+        dragButton.style.backgroundColor = '';
+        dragButton.style.color = '';
+    }
+    
+    // Reset jump button appearance
+    jumpButton.style.backgroundColor = '';
+    jumpButton.style.color = '';
+    
+    // Update graph manager mode
+    if (graphManager) {
+        graphManager.setMode(dragMode ? 'drag' : 'normal');
+    }
 }
 
 // Touch event handlers for mobile

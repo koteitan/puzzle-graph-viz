@@ -20,6 +20,11 @@ function GraphManager() {
   this.lastTouchDistance = 0;
   this.lastTouchCenterX = 0;
   this.lastTouchCenterY = 0;
+  
+  // Mode state
+  this.mode = 'normal'; // 'normal', 'jump', or 'drag'
+  this.draggedNode = null;
+  this.jumpCallback = null;
 }
 
 GraphManager.prototype.init = function(canvas, solver) {
@@ -58,10 +63,34 @@ GraphManager.prototype.setupMouseEvents = function() {
   
   // Mouse drag pan
   this.canvas.addEventListener('mousedown', (e) => {
-    this.isDragging = true;
+    const rect = this.canvas.getBoundingClientRect();
+    // Scale coordinates from display size to canvas internal size
+    const scaleX = this.canvas.width / rect.width;
+    const scaleY = this.canvas.height / rect.height;
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
+    
+    if (this.mode === 'jump') {
+      // Jump mode - find and jump to nearest node
+      const nearestNode = this.findNearestNode(mouseX, mouseY);
+      if (nearestNode && this.jumpCallback) {
+        this.jumpCallback(nearestNode.game);
+      }
+    } else if (this.mode === 'drag') {
+      // Drag mode - find node to drag
+      const nearestNode = this.findNearestNode(mouseX, mouseY);
+      if (nearestNode) {
+        this.draggedNode = nearestNode;
+        this.isDragging = true;
+      }
+    } else {
+      // Normal mode - pan the canvas
+      this.isDragging = true;
+      this.canvas.style.cursor = 'grabbing';
+    }
+    
     this.lastMouseX = e.clientX;
     this.lastMouseY = e.clientY;
-    this.canvas.style.cursor = 'grabbing';
   });
   
   this.canvas.addEventListener('mousemove', (e) => {
@@ -69,8 +98,17 @@ GraphManager.prototype.setupMouseEvents = function() {
       const deltaX = e.clientX - this.lastMouseX;
       const deltaY = e.clientY - this.lastMouseY;
       
-      this.panX += deltaX;
-      this.panY += deltaY;
+      if (this.mode === 'drag' && this.draggedNode) {
+        // Move the dragged node
+        this.draggedNode.x += deltaX / this.zoom;
+        this.draggedNode.y += deltaY / this.zoom;
+        this.draggedNode.vx = 0; // Reset velocity
+        this.draggedNode.vy = 0;
+      } else {
+        // Pan the view
+        this.panX += deltaX;
+        this.panY += deltaY;
+      }
       
       this.lastMouseX = e.clientX;
       this.lastMouseY = e.clientY;
@@ -81,7 +119,16 @@ GraphManager.prototype.setupMouseEvents = function() {
   
   this.canvas.addEventListener('mouseup', () => {
     this.isDragging = false;
-    this.canvas.style.cursor = 'grab';
+    this.draggedNode = null;
+    
+    // Set cursor based on mode
+    if (this.mode === 'jump') {
+      this.canvas.style.cursor = 'crosshair';
+    } else if (this.mode === 'drag') {
+      this.canvas.style.cursor = 'move';
+    } else {
+      this.canvas.style.cursor = 'grab';
+    }
   });
   
   this.canvas.addEventListener('mouseleave', () => {
@@ -449,4 +496,56 @@ GraphManager.prototype.updateCurrentState = function(game) {
     this.solver.updateCurrentState(game);
     this.draw();
   }
+}
+
+GraphManager.prototype.setMode = function(mode) {
+  this.mode = mode;
+  this.draggedNode = null;
+  
+  // Update cursor style based on mode
+  if (mode === 'jump') {
+    this.canvas.style.cursor = 'crosshair';
+  } else if (mode === 'drag') {
+    this.canvas.style.cursor = 'move';
+  } else {
+    this.canvas.style.cursor = 'grab';
+  }
+}
+
+GraphManager.prototype.setJumpCallback = function(callback) {
+  this.jumpCallback = callback;
+}
+
+GraphManager.prototype.findNearestNode = function(mouseX, mouseY) {
+  if (!this.solver || this.solver.visibleGraph.size === 0) return null;
+  
+  // Convert mouse coordinates to world coordinates
+  // Must match the transformation used in draw()
+  const scale = 1.0; // Same scale used in draw()
+  
+  // In draw(), we do: translate(width/2, height/2) -> translate(panX, panY) -> scale(zoom, zoom)
+  // So to reverse: (mouse - center - pan) / zoom
+  const worldX = (mouseX - this.canvas.width / 2 - this.panX) / this.zoom;
+  const worldY = (mouseY - this.canvas.height / 2 - this.panY) / this.zoom;
+  
+  let nearestNode = null;
+  let minDistance = Infinity;
+  
+  this.solver.visibleGraph.forEach(node => {
+    // In draw(), nodes are drawn at: centerX + node.x * scale = 0 + node.x * 1.0 = node.x
+    const nodeScreenX = node.x * scale;
+    const nodeScreenY = node.y * scale;
+    
+    const dx = nodeScreenX - worldX;
+    const dy = nodeScreenY - worldY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    if (distance < minDistance) {
+      minDistance = distance;
+      nearestNode = node;
+    }
+  });
+  
+  // Always return the nearest node, no matter how far
+  return nearestNode;
 }

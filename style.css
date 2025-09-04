@@ -150,10 +150,10 @@ footer a:hover {
     
     button {
         width: auto;  /* Auto width instead of fixed 200px */
-        padding: 8px 15px;  /* Smaller padding for mobile */
-        font-size: 0.9em;  /* Smaller font size */
-        min-width: 60px;  /* Minimum width to ensure readability */
+        padding: 6px 8px;  /* Smaller padding for mobile to fit 5 buttons */
+        font-size: 0.8em;  /* Smaller font size */
+        min-width: 45px;  /* Minimum width to ensure readability */
         flex: 1;  /* Equal width distribution */
-        max-width: 100px;  /* Maximum width to keep them small */
+        max-width: 70px;  /* Maximum width to keep them small */
     }
 }
