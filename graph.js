@@ -25,6 +25,11 @@ function GraphManager() {
   this.mode = 'normal'; // 'normal', 'jump', or 'drag'
   this.draggedNode = null;
   this.jumpCallback = null;
+  
+  // Jump mode state
+  this.jumpStartX = 0;
+  this.jumpStartY = 0;
+  this.hasMovedSincePress = false;
 }
 
 GraphManager.prototype.init = function(canvas, solver) {
@@ -71,11 +76,11 @@ GraphManager.prototype.setupMouseEvents = function() {
     const mouseY = (e.clientY - rect.top) * scaleY;
     
     if (this.mode === 'jump') {
-      // Jump mode - find and jump to nearest node
-      const nearestNode = this.findNearestNode(mouseX, mouseY);
-      if (nearestNode && this.jumpCallback) {
-        this.jumpCallback(nearestNode.game);
-      }
+      // Jump mode - prepare for potential jump, but allow dragging
+      this.jumpStartX = mouseX;
+      this.jumpStartY = mouseY;
+      this.hasMovedSincePress = false;
+      this.isDragging = true;
     } else if (this.mode === 'drag') {
       // Drag mode - find node to drag
       const nearestNode = this.findNearestNode(mouseX, mouseY);
@@ -98,6 +103,14 @@ GraphManager.prototype.setupMouseEvents = function() {
       const deltaX = e.clientX - this.lastMouseX;
       const deltaY = e.clientY - this.lastMouseY;
       
+      // Check if we've moved significantly (for jump mode)
+      if (this.mode === 'jump' && !this.hasMovedSincePress) {
+        const totalMovement = Math.abs(deltaX) + Math.abs(deltaY);
+        if (totalMovement > 3) { // 3px threshold
+          this.hasMovedSincePress = true;
+        }
+      }
+      
       if (this.mode === 'drag' && this.draggedNode) {
         // Move the dragged node
         this.draggedNode.x += deltaX / this.zoom;
@@ -105,7 +118,7 @@ GraphManager.prototype.setupMouseEvents = function() {
         this.draggedNode.vx = 0; // Reset velocity
         this.draggedNode.vy = 0;
       } else {
-        // Pan the view
+        // Pan the view (works in normal mode, jump mode when dragging, etc.)
         this.panX += deltaX;
         this.panY += deltaY;
       }
@@ -117,9 +130,25 @@ GraphManager.prototype.setupMouseEvents = function() {
     }
   });
   
-  this.canvas.addEventListener('mouseup', () => {
+  this.canvas.addEventListener('mouseup', (e) => {
+    // Handle jump mode on mouse release
+    if (this.mode === 'jump' && !this.hasMovedSincePress && this.jumpCallback) {
+      // Only jump if we haven't dragged significantly
+      const rect = this.canvas.getBoundingClientRect();
+      const scaleX = this.canvas.width / rect.width;
+      const scaleY = this.canvas.height / rect.height;
+      const mouseX = (e.clientX - rect.left) * scaleX;
+      const mouseY = (e.clientY - rect.top) * scaleY;
+      
+      const nearestNode = this.findNearestNode(mouseX, mouseY);
+      if (nearestNode) {
+        this.jumpCallback(nearestNode.game);
+      }
+    }
+    
     this.isDragging = false;
     this.draggedNode = null;
+    this.hasMovedSincePress = false;
     
     // Set cursor based on mode
     if (this.mode === 'jump') {
@@ -150,8 +179,34 @@ GraphManager.prototype.setupTouchEvents = function() {
     this.touches = Array.from(e.touches);
     
     if (this.touches.length === 1) {
-      // Single touch - start pan
-      this.isDragging = true;
+      // Single touch - handle based on mode
+      const rect = this.canvas.getBoundingClientRect();
+      const scaleX = this.canvas.width / rect.width;
+      const scaleY = this.canvas.height / rect.height;
+      const touchX = (this.touches[0].clientX - rect.left) * scaleX;
+      const touchY = (this.touches[0].clientY - rect.top) * scaleY;
+      
+      if (this.mode === 'jump') {
+        // Jump mode - prepare for potential jump, but allow dragging
+        this.jumpStartX = touchX;
+        this.jumpStartY = touchY;
+        this.hasMovedSincePress = false;
+        this.isDragging = true;
+      } else if (this.mode === 'drag') {
+        // Drag mode - find node to drag
+        const nearestNode = this.findNearestNode(touchX, touchY);
+        if (nearestNode) {
+          this.draggedNode = nearestNode;
+          this.isDragging = true;
+        } else {
+          // No node found, fall back to pan
+          this.isDragging = true;
+        }
+      } else {
+        // Normal mode - pan
+        this.isDragging = true;
+      }
+      
       this.lastMouseX = this.touches[0].clientX;
       this.lastMouseY = this.touches[0].clientY;
     } else if (this.touches.length === 2) {
@@ -173,12 +228,29 @@ GraphManager.prototype.setupTouchEvents = function() {
     this.touches = Array.from(e.touches);
     
     if (this.touches.length === 1 && this.isDragging) {
-      // Single touch pan
+      // Single finger operation
       const deltaX = this.touches[0].clientX - this.lastMouseX;
       const deltaY = this.touches[0].clientY - this.lastMouseY;
       
-      this.panX += deltaX;
-      this.panY += deltaY;
+      // Check if we've moved significantly (for jump mode)
+      if (this.mode === 'jump' && !this.hasMovedSincePress) {
+        const totalMovement = Math.abs(deltaX) + Math.abs(deltaY);
+        if (totalMovement > 5) { // Slightly higher threshold for touch
+          this.hasMovedSincePress = true;
+        }
+      }
+      
+      if (this.mode === 'drag' && this.draggedNode) {
+        // Move the dragged node
+        this.draggedNode.x += deltaX / this.zoom;
+        this.draggedNode.y += deltaY / this.zoom;
+        this.draggedNode.vx = 0; // Reset velocity
+        this.draggedNode.vy = 0;
+      } else {
+        // Pan the view (works in normal mode, jump mode when dragging, etc.)
+        this.panX += deltaX;
+        this.panY += deltaY;
+      }
       
       this.lastMouseX = this.touches[0].clientX;
       this.lastMouseY = this.touches[0].clientY;
@@ -234,11 +306,29 @@ GraphManager.prototype.setupTouchEvents = function() {
   // Touch end
   this.canvas.addEventListener('touchend', (e) => {
     e.preventDefault();
+    
+    // Handle jump mode on touch end
+    if (this.touches.length === 1 && this.mode === 'jump' && !this.hasMovedSincePress && this.jumpCallback) {
+      // Only jump if we haven't dragged significantly
+      const rect = this.canvas.getBoundingClientRect();
+      const scaleX = this.canvas.width / rect.width;
+      const scaleY = this.canvas.height / rect.height;
+      const touchX = (this.touches[0].clientX - rect.left) * scaleX;
+      const touchY = (this.touches[0].clientY - rect.top) * scaleY;
+      
+      const nearestNode = this.findNearestNode(touchX, touchY);
+      if (nearestNode) {
+        this.jumpCallback(nearestNode.game);
+      }
+    }
+    
     this.touches = Array.from(e.touches);
     
     if (this.touches.length === 0) {
       // All touches ended
       this.isDragging = false;
+      this.draggedNode = null;
+      this.hasMovedSincePress = false;
       this.lastTouchDistance = 0;
       this.lastTouchCenterX = 0;
       this.lastTouchCenterY = 0;
