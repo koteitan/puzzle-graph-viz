@@ -30,6 +30,9 @@ function GraphManager() {
   this.jumpStartX = 0;
   this.jumpStartY = 0;
   this.hasMovedSincePress = false;
+  
+  // Shortest path for solver mode
+  this.shortestPath = [];
 }
 
 GraphManager.prototype.init = function(canvas, solver) {
@@ -426,6 +429,25 @@ GraphManager.prototype.draw = function() {
     });
   });
   
+  // Draw shortest path in bright green if solver mode is active
+  if (this.shortestPath && this.shortestPath.length > 1) {
+    this.ctx.strokeStyle = '#00FF00';  // Bright green
+    this.ctx.lineWidth = 3 / this.zoom;  // Thicker line for path
+    
+    for (let i = 0; i < this.shortestPath.length - 1; i++) {
+      const node = this.shortestPath[i];
+      const nextNode = this.shortestPath[i + 1];
+      
+      // Only draw if both nodes are visible
+      if (this.solver.visibleGraph.has(node.hash) && this.solver.visibleGraph.has(nextNode.hash)) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(centerX + node.x * scale, centerY + node.y * scale);
+        this.ctx.lineTo(centerX + nextNode.x * scale, centerY + nextNode.y * scale);
+        this.ctx.stroke();
+      }
+    }
+  }
+  
   // Draw nodes
   this.solver.visibleGraph.forEach(node => {
     const x = centerX + node.x * scale;
@@ -604,6 +626,50 @@ GraphManager.prototype.setMode = function(mode) {
 
 GraphManager.prototype.setJumpCallback = function(callback) {
   this.jumpCallback = callback;
+}
+
+GraphManager.prototype.calculateShortestPath = function() {
+  if (!this.solver || !this.solver.goalNode || !this.solver.startNode) {
+    this.shortestPath = [];
+    return;
+  }
+  
+  // Backtrack from goal to start using depth (BFS guarantees shortest path)
+  const path = [];
+  let currentNode = this.solver.goalNode;
+  path.push(currentNode);
+  
+  // Find path by going to neighbors with smaller depth
+  while (currentNode !== this.solver.startNode) {
+    let nextNode = null;
+    let minDepth = currentNode.depth;
+    
+    // Find neighbor with depth = current depth - 1
+    for (const neighbor of currentNode.edgelist) {
+      if (neighbor.depth === currentNode.depth - 1) {
+        nextNode = neighbor;
+        break;
+      }
+    }
+    
+    if (!nextNode) {
+      // No path found (shouldn't happen with proper BFS)
+      console.error('No path found from goal to start');
+      this.shortestPath = [];
+      return;
+    }
+    
+    path.push(nextNode);
+    currentNode = nextNode;
+  }
+  
+  // Reverse to get path from start to goal
+  this.shortestPath = path.reverse();
+  console.log('Shortest path calculated, length:', this.shortestPath.length);
+}
+
+GraphManager.prototype.clearShortestPath = function() {
+  this.shortestPath = [];
 }
 
 GraphManager.prototype.findNearestNode = function(mouseX, mouseY) {

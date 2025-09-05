@@ -7,6 +7,7 @@ let graphManager = null;
 let debugTextarea = null;
 let jumpMode = false;
 let dragMode = false;
+let solverMode = false;
 
 // Debug logging function
 function debugLog(message) {
@@ -64,6 +65,7 @@ window.addEventListener('load', () => {
     
     document.getElementById('undoButton').addEventListener('click', handleUndo);
     document.getElementById('resetButton').addEventListener('click', handleReset);
+    document.getElementById('graphButton').addEventListener('click', handleGraph);
     document.getElementById('solverButton').addEventListener('click', handleSolver);
     document.getElementById('jumpButton').addEventListener('click', handleJumpToggle);
     document.getElementById('dragButton').addEventListener('click', handleDragToggle);
@@ -471,7 +473,7 @@ function checkGoal() {
     }
 }
 
-function handleSolver() {
+function handleGraph() {
     const gameArea = document.querySelector('.game-area');
     const graphCanvas = document.getElementById('graph');
     
@@ -505,6 +507,34 @@ function handleSolver() {
     // Resize canvases for new layout
     resizeCanvas();
     draw();
+}
+
+function handleSolver() {
+    solverMode = !solverMode;
+    const solverButton = document.getElementById('solverButton');
+    
+    if (solverMode) {
+        solverButton.style.backgroundColor = '#4CAF50';
+        solverButton.style.color = 'white';
+        
+        // Calculate shortest path when solver mode is turned on
+        if (graphManager) {
+            graphManager.calculateShortestPath();
+        }
+    } else {
+        solverButton.style.backgroundColor = '';
+        solverButton.style.color = '';
+        
+        // Clear shortest path when solver mode is turned off
+        if (graphManager) {
+            graphManager.clearShortestPath();
+        }
+    }
+    
+    // Redraw to show/hide path
+    if (graphManager) {
+        graphManager.draw();
+    }
 }
 
 function handleJumpToggle() {
