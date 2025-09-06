@@ -510,8 +510,62 @@ function handleGraph() {
 }
 
 function handleSolver() {
-    // Solver button functionality - currently placeholder for future features
-    // solverMode variable is kept for future use
+    // Auto-solve: move one step closer to goal
+    if (!graphManager || !graphManager.solver || !graphManager.solver.graph) {
+        console.log('Solver not ready');
+        return;
+    }
+    
+    // Get current game state's node
+    const currentHash = game.hash();
+    const currentNode = graphManager.solver.graph.get(currentHash);
+    
+    if (!currentNode) {
+        console.log('Current state not found in graph');
+        return;
+    }
+    
+    if (currentNode.goalcount === -1) {
+        console.log('Goal counts not calculated yet');
+        return;
+    }
+    
+    if (currentNode.goalcount === 0) {
+        console.log('Already at goal!');
+        return;
+    }
+    
+    // Find the neighbor with the smallest goalcount
+    let bestNode = null;
+    let minGoalCount = Infinity;
+    
+    for (const neighbor of currentNode.edgelist) {
+        if (neighbor.goalcount >= 0 && neighbor.goalcount < minGoalCount) {
+            minGoalCount = neighbor.goalcount;
+            bestNode = neighbor;
+        }
+    }
+    
+    if (bestNode) {
+        console.log(`Moving from node with goalcount ${currentNode.goalcount} to ${bestNode.goalcount}`);
+        
+        // Save current state for undo
+        history.push(game.clone());
+        
+        // Move to the best neighbor
+        game = bestNode.game.clone();
+        
+        // Update display
+        draw();
+        checkGoal();
+        
+        // Update graph visualization
+        if (graphManager) {
+            graphManager.updateCurrentState(game);
+        }
+    } else {
+        console.log('No better neighbor found');
+    }
 }
 
 function handleJumpToggle() {

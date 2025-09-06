@@ -5,6 +5,7 @@ function GraphNode(game, depth = 0) {
   this.edgelist = [];
   this.type = 'normal'; // 'start', 'goal', 'normal'
   this.depth = depth; // Distance from start node
+  this.goalcount = -1; // Distance to goal node (-1 means not calculated yet)
   
   // Physics properties - position will be set when added to visible graph
   this.x = 0;
@@ -160,4 +161,35 @@ Solver.prototype.addNextVisibleNode = function() {
   this.visibleGraph.set(node.hash, node);
   
   return true;
+}
+
+Solver.prototype.calculateGoalCounts = function() {
+  if (!this.goalNode) {
+    console.log('No goal node found, cannot calculate goal counts');
+    return;
+  }
+  
+  // Initialize all nodes with goalcount = -1 (not calculated)
+  this.graph.forEach(node => {
+    node.goalcount = -1;
+  });
+  
+  // BFS from goal node to calculate distance to all reachable nodes
+  const queue = [this.goalNode];
+  this.goalNode.goalcount = 0;
+  
+  while (queue.length > 0) {
+    const node = queue.shift();
+    
+    // Process all neighbors
+    for (const neighbor of node.edgelist) {
+      // If neighbor hasn't been visited yet
+      if (neighbor.goalcount === -1) {
+        neighbor.goalcount = node.goalcount + 1;
+        queue.push(neighbor);
+      }
+    }
+  }
+  
+  console.log('Goal counts calculated for all nodes');
 }

@@ -381,6 +381,9 @@ GraphManager.prototype.startSolver = function(game) {
       clearInterval(this.solverInterval);
       this.solverInterval = null;
       console.log('Solver finished exploring. Total nodes:', this.solver.graph.size);
+      
+      // Calculate goal counts after exploration is complete
+      this.solver.calculateGoalCounts();
     }
   }, 100);  // Run solver every 100ms
   
