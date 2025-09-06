@@ -510,31 +510,8 @@ function handleGraph() {
 }
 
 function handleSolver() {
-    solverMode = !solverMode;
-    const solverButton = document.getElementById('solverButton');
-    
-    if (solverMode) {
-        solverButton.style.backgroundColor = '#4CAF50';
-        solverButton.style.color = 'white';
-        
-        // Calculate shortest path when solver mode is turned on
-        if (graphManager) {
-            graphManager.calculateShortestPath();
-        }
-    } else {
-        solverButton.style.backgroundColor = '';
-        solverButton.style.color = '';
-        
-        // Clear shortest path when solver mode is turned off
-        if (graphManager) {
-            graphManager.clearShortestPath();
-        }
-    }
-    
-    // Redraw to show/hide path
-    if (graphManager) {
-        graphManager.draw();
-    }
+    // Solver button functionality - currently placeholder for future features
+    // solverMode variable is kept for future use
 }
 
 function handleJumpToggle() {

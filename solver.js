@@ -23,6 +23,7 @@ function Solver() {
   this.startNode = null;
   this.goalNode = null;
   this.currentStateNode = null;
+  this.goalPathCalculated = false; // Flag to ensure path is calculated only once
   
   // For visualization
   this.visibleGraph = new Map(); // Nodes currently visible
@@ -91,6 +92,16 @@ Solver.prototype.step = function() {
         // Add edge (bidirectional)
         node.edgelist.push(nextNode);
         nextNode.edgelist.push(node);
+        
+        // Calculate shortest path AFTER edges are added
+        if (nextNode.type === 'goal' && !this.goalPathCalculated) {
+          this.goalPathCalculated = true;
+          console.log('Calculating shortest path after edges added');
+          if (typeof graphManager !== 'undefined' && graphManager) {
+            graphManager.calculateShortestPath();
+            graphManager.draw();
+          }
+        }
       }
     }
   }
