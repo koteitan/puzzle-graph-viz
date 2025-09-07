@@ -56,45 +56,53 @@ Game.prototype.clone = function() {
   return g;
 }
 Game.prototype.move = function(dir) {
-  const b0 = this.board; 
-  const i0 = findzero(b0);
+  const b0 = this.board;   /* original board */
+  const y0 = findzero(b0); /* position of zero */
   let game;
   let x;
   let y;
   let piece;
   let ribpiece;
   switch(dir) {
-    case 0: /* up 0 --------------------------- */
-      if(i0 <= 0) return 0;
+    case 0: /* move piece down --------------------------- */
+      if(y0 <= 0) return 0; /* 0 is at the top */
+      const src = y0-1;
+      const dst = y0;
+      if(ribtable[src][this.irod]!=0) return 0; /* blocked by rib */
+      if(ribtable[dst][this.irod]!=0) return 0; /* blocked by rib */
       game = this.clone();
-      game.board[i0  ] = b0[i0-1];
-      game.board[i0-1] = 0;
+      game.board[dst] = b0[src];
+      game.board[src] = 0;
       return game;
-    case 1: /* down 0 ------------------------- */
-      if(i0 >= b0.length-1) return 0;
+    case 1: /* move piece up ------------------------- */
+      if(y0 >= b0.length-1) return 0; /* 0 is at the bottom */
+      const src2 = y0+1;
+      const dst2 = y0;
+      if(ribtable[src2][this.irod]!=0) return 0; /* blocked by rib */
+      if(ribtable[dst2][this.irod]!=0) return 0; /* blocked by rib */
       game = this.clone();
-      game.board[i0  ] = b0[i0+1];
-      game.board[i0+1] = 0;
+      game.board[dst2] = b0[src2];
+      game.board[src2] = 0;
       return game;
     case 2: /* swap up ------------------------- */
-      if(i0 >= b0.length-2) return 0;
+      if(y0 >= b0.length-2) return 0;
       x     = this.irod;
-      y     = i0+1;
+      y     = y0+1;
       piece = b0[y];
       if(notchtable[y][x]!=piece) return 0;
       game = this.clone();
-      game.board[i0  ] = b0[i0+2];
-      game.board[i0+2] = 0;
+      game.board[y0  ] = b0[y0+2];
+      game.board[y0+2] = 0;
       return game;
     case 3: /* swap down ----------------------- */
-      if(i0 <= 1) return 0;
+      if(y0 <= 1) return 0;
       x     = this.irod;
-      y     = i0-1;
+      y     = y0-1;
       piece = b0[y];
       if(notchtable[y][x]!=piece) return 0;
       game = this.clone();
-      game.board[i0  ] = b0[i0-2];
-      game.board[i0-2] = 0;
+      game.board[y0  ] = b0[y0-2];
+      game.board[y0-2] = 0;
       return game;
     case 4: /* rod up -------------------------- */
       x = (this.irod + 1 + 6)%6;
