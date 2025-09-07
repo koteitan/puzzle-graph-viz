@@ -64,7 +64,6 @@ Solver.prototype.step = function() {
     const nextGame = node.game.move(dir);
     if (nextGame) {
       const nextHash = nextGame.hash();
-      
       if (this.graph.has(nextHash)) {
         // Node already exists - just add edge if needed
         const existingNode = this.graph.get(nextHash);
@@ -94,15 +93,6 @@ Solver.prototype.step = function() {
         node.edgelist.push(nextNode);
         nextNode.edgelist.push(node);
         
-        // Calculate shortest path AFTER edges are added
-        if (nextNode.type === 'goal' && !this.goalPathCalculated) {
-          this.goalPathCalculated = true;
-          console.log('Calculating shortest path after edges added');
-          if (typeof graphManager !== 'undefined' && graphManager) {
-            graphManager.calculateShortestPath();
-            graphManager.draw();
-          }
-        }
       }
     }
   }

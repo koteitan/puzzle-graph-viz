@@ -384,6 +384,10 @@ GraphManager.prototype.startSolver = function(game) {
       
       // Calculate goal counts after exploration is complete
       this.solver.calculateGoalCounts();
+      
+      // Calculate shortest path using goal counts
+      this.calculateShortestPath();
+      this.draw();
     }
   }, 100);  // Run solver every 100ms
   
@@ -646,27 +650,38 @@ GraphManager.prototype.calculateShortestPath = function() {
     return;
   }
   
-  // Backtrack from goal to start using depth (BFS guarantees shortest path)
+  // Forward search from start to goal using goal count
   const path = [];
-  let currentNode = this.solver.goalNode;
+  let currentNode = this.solver.startNode;
   path.push(currentNode);
   
-  // Find path by going to neighbors with smaller depth
-  while (currentNode !== this.solver.startNode) {
+  // Follow the path with minimum goal count until reaching goal
+  while (currentNode !== this.solver.goalNode) {
     let nextNode = null;
-    let minDepth = currentNode.depth;
+    let minGoalCount = Infinity;
     
-    // Find neighbor with depth = current depth - 1
+    // Find neighbor with minimum goal count
     for (const neighbor of currentNode.edgelist) {
-      if (neighbor.depth === currentNode.depth - 1) {
+      //const b0 = currentNode.game.board;
+      //const b1 = neighbor.game.board;
+      //if(b0[0]==0 && b0[1]==2 && b0[2]==3 && b0[3]==1 && b0[4]==4 && b0[5]==5 && rodtable[currentNode.game.irod]==1 &&
+        //b1[0]==0 && b1[1]==2 && b1[2]==3 && b1[3]==1 && b1[4]==4 && b1[5]==5 && rodtable[neighbor.game.irod]==-2) {
+        //console.log("edge found");
+      //}
+      //if(b1[0]==0 && b1[1]==2 && b1[2]==3 && b1[3]==1 && b1[4]==4 && b1[5]==5 && rodtable[neighbor.game.irod]==1 &&
+        //b0[0]==0 && b0[1]==2 && b0[2]==3 && b0[3]==1 && b0[4]==4 && b0[5]==5 && rodtable[currentNode.game.irod]==-2) {
+        //console.log("edge found");
+      //}
+
+      if (neighbor.goalcount >= 0 && neighbor.goalcount < minGoalCount) {
+        minGoalCount = neighbor.goalcount;
         nextNode = neighbor;
-        break;
       }
     }
     
     if (!nextNode) {
-      // No path found (shouldn't happen with proper BFS)
-      console.error('No path found from goal to start');
+      // No path found (shouldn't happen if goal counts are properly calculated)
+      console.error('No path found from start to goal using goal counts');
       this.shortestPath = [];
       return;
     }
@@ -675,9 +690,9 @@ GraphManager.prototype.calculateShortestPath = function() {
     currentNode = nextNode;
   }
   
-  // Reverse to get path from start to goal
-  this.shortestPath = path.reverse();
-  console.log('Shortest path calculated, length:', this.shortestPath.length);
+  // Path is already in correct order (start to goal)
+  this.shortestPath = path;
+  console.log('Shortest path calculated using goal counts, length:', this.shortestPath.length);
 }
 
 GraphManager.prototype.clearShortestPath = function() {
