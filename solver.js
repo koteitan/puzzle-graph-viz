@@ -6,6 +6,7 @@ function GraphNode(game, depth = 0) {
   this.type = 'normal'; // 'start', 'goal', 'normal'
   this.depth = depth; // Distance from start node
   this.goalcount = -1; // Distance to goal node (-1 means not calculated yet)
+  this.edgefrom = null; // Hash of the parent node in BFS tree
   
   // Physics properties - position will be set when added to visible graph
   this.x = 0;
@@ -74,6 +75,7 @@ Solver.prototype.step = function() {
       } else {
         // Found a new node to add! Set depth as current node's depth + 1
         const nextNode = new GraphNode(nextGame, node.depth + 1);
+        nextNode.edgefrom = node.hash; // Store parent node hash for backtracking
         
         // Check if goal
         if (nextGame.isGoal()) {
@@ -187,4 +189,28 @@ Solver.prototype.calculateGoalCounts = function() {
   if (graphManager) {
     graphManager.draw();
   }
+}
+
+Solver.prototype.backtrack_edgefrom = function(targetHash) {
+  // Trace back from the given hash to the start using edgefrom
+  const path = [];
+  let currentHash = targetHash;
+  
+  while (currentHash) {
+    const node = this.graph.get(currentHash);
+    if (!node) {
+      console.log('Node not found for hash:', currentHash);
+      break;
+    }
+    
+    path.push(currentHash);
+    currentHash = node.edgefrom;
+  }
+  
+  console.log('Backtrack path from', targetHash, ':');
+  path.forEach((hash, index) => {
+    console.log(`  ${index}: ${hash}`);
+  });
+  
+  return path;
 }
