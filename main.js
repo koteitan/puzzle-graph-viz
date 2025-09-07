@@ -9,6 +9,7 @@ let jumpMode = false;
 let dragMode = false;
 let solverMode = false;
 let display_goal_count = 0;
+let nodesPerVisualizationCycle = 25;
 
 // Debug logging function
 function debugLog(message) {

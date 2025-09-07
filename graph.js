@@ -391,16 +391,16 @@ GraphManager.prototype.startSolver = function(game) {
     }
   }, 100);  // Run solver every 100ms
   
-  // Visualize nodes at faster speed (4 per second)
+  // Visualize nodes at faster speed
   this.visualizationInterval = setInterval(() => {
-    const added = this.solver.addNextVisibleNode();
+    const added = this.solver.addNextVisibleNodes(nodesPerVisualizationCycle);
     // console.log('Visible nodes:', this.solver.visibleGraph.size, '/', this.solver.graph.size);
     if (!added && !this.solverInterval) {
       clearInterval(this.visualizationInterval);
       this.visualizationInterval = null;
       console.log('Visualization complete');
     }
-  }, 5);  // Add 1 visible node per 5ms (200 per second)
+  }, 5);  // Add multiple nodes per 5ms
 }
 
 GraphManager.prototype.draw = function() {
