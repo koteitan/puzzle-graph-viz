@@ -468,6 +468,15 @@ GraphManager.prototype.draw = function() {
     this.ctx.strokeStyle = '#333';
     this.ctx.lineWidth = 1 / this.zoom;  // Constant line width regardless of zoom
     this.ctx.stroke();
+    
+    // Draw goal count text if available and display is enabled
+    if (display_goal_count == 1 && node.goalcount >= 0) {
+      this.ctx.fillStyle = 'white';
+      this.ctx.font = `${12 / this.zoom}px Arial`;  // Scale font with zoom
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      this.ctx.fillText(node.goalcount.toString(), x, y);
+    }
   });
   
   // Draw start node as large green circle

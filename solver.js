@@ -192,4 +192,9 @@ Solver.prototype.calculateGoalCounts = function() {
   }
   
   console.log('Goal counts calculated for all nodes');
+  
+  // Trigger redraw to show goal counts
+  if (graphManager) {
+    graphManager.draw();
+  }
 }

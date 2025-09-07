@@ -8,6 +8,7 @@ let debugTextarea = null;
 let jumpMode = false;
 let dragMode = false;
 let solverMode = false;
+let display_goal_count = 0;
 
 // Debug logging function
 function debugLog(message) {
