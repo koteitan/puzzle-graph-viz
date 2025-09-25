@@ -1,3 +1,11 @@
+# How to Have AI Add Your Puzzle
+
+If you're using an AI assistant to add your puzzle, you can use this prompt:
+
+```
+Please read the "How to Add Your Puzzle" section below and add a new puzzle called [YOUR_PUZZLE_NAME].
+```
+
 # How to Add Your Puzzle
 
 This framework allows you to easily add new puzzles to the system. Each puzzle consists of a game logic class and a renderer class that extend the abstract base classes.
