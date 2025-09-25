@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanoi Tower Solver</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-area {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .game-area.graph-visible {
+            justify-content: space-between;
+        }
+
+        canvas {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #graph {
+            display: none;
+        }
+
+        .game-area.graph-visible #graph {
+            display: block;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ff5252, #d63031);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #jumpButton, #dragButton {
+            background: linear-gradient(45deg, #4834d4, #686de0);
+        }
+
+        #jumpButton:hover, #dragButton:hover {
+            background: linear-gradient(45deg, #3742fa, #5352ed);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #74b9ff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .game-area {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .game-area.graph-visible {
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Hanoi Tower Solver</h1>
+    </header>
+
+    <div class="game-container">
+        <div class="game-area">
+            <canvas id="board"></canvas>
+            <canvas id="graph"></canvas>
+        </div>
+
+        <div class="controls">
+            <button id="undoButton">Undo</button>
+            <button id="resetButton">Reset</button>
+            <button id="graphButton">Graph</button>
+            <button id="solverButton">Solver</button>
+            <button id="jumpButton">Jump</button>
+            <button id="dragButton">Drag</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Tower of Hanoi is a classic puzzle with mathematical properties.</p>
+        <p>
+            <a href="https://en.wikipedia.org/wiki/Tower_of_Hanoi" target="_blank">Learn more about Hanoi Tower</a>
+        </p>
+        <p>Hanoi Tower Solver is part of a multi-puzzle system | <a href="../">Back to Puzzle Hub</a></p>
+    </footer>
+
+    <script src="abstract-game.js"></script>
+    <script src="abstract-renderer.js"></script>
+    <script src="hanoi.js"></script>
+    <script src="hanoi-renderer.js"></script>
+    <script src="solver.js"></script>
+    <script src="graph.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

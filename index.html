@@ -3,47 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iwahswap Simulator</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Puzzle Hub - Abstract Game Framework</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            margin-top: 10px;
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .puzzle-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .puzzle-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .puzzle-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .puzzle-title {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .puzzle-description {
+            font-size: 1em;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 25px;
+        }
+
+        .puzzle-link {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .puzzle-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #ff5252, #d63031);
+        }
+
+        .puzzle-link:active {
+            transform: translateY(0);
+        }
+
+        .features {
+            margin-top: 60px;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-item h3 {
+            margin-top: 0;
+            color: #4ecdc4;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: #74b9ff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .puzzle-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .puzzle-card {
+                padding: 20px;
+            }
+
+            .feature-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>Iwahswap Simulator</h1>
+        <h1>Puzzle Hub</h1>
+        <p class="subtitle">Abstract Game Framework with BFS Solver & Graph Visualization</p>
     </header>
-    
-    <div class="game-container">
-        <div class="game-area">
-            <canvas id="board"></canvas>
-            <canvas id="graph"></canvas>
+
+    <main>
+        <div class="puzzle-grid">
+            <div class="puzzle-card">
+                <div class="puzzle-icon">🔄</div>
+                <div class="puzzle-title">Iwahswap</div>
+                <div class="puzzle-description">
+                    A sliding puzzle developed by Iwahiro, featuring a unique rod mechanism that controls piece movement.
+                    Navigate pieces through blocked paths using the rotating rod system.
+                </div>
+                <a href="iwahswap/" class="puzzle-link">Play Iwahswap</a>
+            </div>
+
+            <div class="puzzle-card">
+                <div class="puzzle-icon">🏗️</div>
+                <div class="puzzle-title">Hanoi Tower</div>
+                <div class="puzzle-description">
+                    The classic Tower of Hanoi puzzle with 5 disks. Move all disks from the first tower to the last,
+                    following the rule that larger disks cannot be placed on smaller ones.
+                </div>
+                <a href="hanoi/" class="puzzle-link">Play Hanoi Tower</a>
+            </div>
         </div>
-        
-        <textarea id="debugout" style="width: 100%; height: 200px; font-family: monospace; background: rgba(0,0,0,0.8); color: #00ff00; border: 1px solid white; margin: 10px 0; display: none;"></textarea>
-        
-        <div class="controls">
-            <button id="undoButton">Undo</button>
-            <button id="resetButton">Reset</button>
-            <button id="graphButton">Graph</button>
-            <button id="solverButton">Solver</button>
-            <button id="jumpButton">Jump</button>
-            <button id="dragButton">Drag</button>
+
+        <div class="features">
+            <h2>Framework Features</h2>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h3>🧩 Abstract Architecture</h3>
+                    <p>Modular design with AbstractGame and AbstractRenderer base classes for easy puzzle extension</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🔍 BFS Solver</h3>
+                    <p>Breadth-first search algorithm explores the state space and finds optimal solutions</p>
+                </div>
+                <div class="feature-item">
+                    <h3>📊 Graph Visualization</h3>
+                    <p>Interactive force-directed graph showing state transitions with physics simulation</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🎮 Interactive UI</h3>
+                    <p>Touch/mouse support, undo system, state jumping, and real-time visualization</p>
+                </div>
+            </div>
         </div>
-    </div>
-    
+    </main>
+
     <footer>
-        <p>Iwahswap is a puzzle developed in a creative exchange between Iwahiro (Hirokazu Iwasawa), Goetz Schwandtner, Bram Cohen and Oskar van Deventer.</p>
         <p>
-            <a href="https://www.youtube.com/watch?v=3rFQOCd4fXE" target="_blank">Original YouTube by Oskar</a> | 
-            <a href="https://twistypuzzles.com/forum/viewtopic.php?t=40126" target="_blank">TwistyPuzzles.com Forum Discussion</a>
+            This puzzle framework demonstrates abstract base classes and modular architecture in JavaScript.<br>
+            Each puzzle implements AbstractGame and AbstractRenderer interfaces for consistent behavior.
         </p>
-        <p>Iwahswap Simulator is programmed by <a href="https://twitter.com/koteitan" target="_blank">koteitan</a> | The program is on <a href="https://github.com/koteitan/iwahswap">github</a> and licensed under <a href="https://github.com/koteitan/iwahswap/blob/2e8d38b1787acc0c22e67852c23f59adb7b6cc97/LICENSE">MIT License</a></p>
+        <p>
+            Developed as part of an exploration into puzzle game architecture and AI solving techniques.
+        </p>
     </footer>
-    
-    <script src="abstract-game.js"></script>
-    <script src="abstract-renderer.js"></script>
-    <script src="iwahswap.js"></script>
-    <script src="iwahswap-renderer.js"></script>
-    <script src="solver.js"></script>
-    <script src="graph.js"></script>
-    <script src="main.js"></script>
 </body>
 </html>
