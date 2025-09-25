@@ -118,6 +118,9 @@ function handleCanvasClick(event) {
         if (graphManager) {
             graphManager.updateCurrentState(game);
         }
+    } else if (result.selectionChanged) {
+        // Just redraw to show selection changes
+        draw();
     }
 }
 
@@ -126,6 +129,8 @@ function handleCanvasClick(event) {
 function handleUndo() {
     if (history.length > 0) {
         game = history.pop();
+        // Reset selection on undo
+        renderer.selectedTower = -1;
         if (graphManager) {
             graphManager.updateCurrentState(game);
         }
@@ -136,11 +141,13 @@ function handleUndo() {
 function handleReset() {
     // Save current state for undo
     const initialBoard = game.getInitialBoard();
-    if (JSON.stringify(game.board) !== JSON.stringify(initialBoard)) {
+    if (JSON.stringify(game.towers) !== JSON.stringify(initialBoard)) {
         history.push(game.clone());
     }
 
     game.init();
+    // Reset selection on reset
+    renderer.selectedTower = -1;
     if (graphManager) {
         graphManager.updateCurrentState(game);
     }

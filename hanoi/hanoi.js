@@ -4,6 +4,9 @@ class HanoiGame extends AbstractGame {
     super();
     this.towers = null;  // Array of 3 towers, each is an array of disks
     this.numDisks = 5;   // Number of disks
+    this.moveMap = [
+      [0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1]
+    ];
   }
 
   init() {
@@ -17,6 +20,7 @@ class HanoiGame extends AbstractGame {
   clone() {
     const g = new HanoiGame();
     g.numDisks = this.numDisks;
+    g.moveMap = this.moveMap; // Share the same moveMap reference
     g.towers = [
       this.towers[0].slice(),
       this.towers[1].slice(),
@@ -26,12 +30,11 @@ class HanoiGame extends AbstractGame {
   }
 
   move(direction) {
-    // Direction encoding: fromTower * 3 + toTower
-    // 0: 0→1, 1: 0→2, 2: 1→0, 3: 1→2, 4: 2→0, 5: 2→1
-    const fromTower = Math.floor(direction / 3);
-    const toTower = direction % 3;
+    // Direction encoding: 0: 0→1, 1: 0→2, 2: 1→0, 3: 1→2, 4: 2→0, 5: 2→1
+    if (direction < 0 || direction >= this.moveMap.length) return null;
 
-    if (fromTower === toTower) return null;
+    const [fromTower, toTower] = this.moveMap[direction];
+
     if (this.towers[fromTower].length === 0) return null;  // No disk to move
 
     const topDisk = this.towers[fromTower][this.towers[fromTower].length - 1];
@@ -79,8 +82,9 @@ class HanoiGame extends AbstractGame {
         return `hsl(${hue}, 70%, 50%)`;
       },
       edgeColor: (direction) => {
-        const fromTower = Math.floor(direction / 3);
-        const toTower = direction % 3;
+        if (direction < 0 || direction >= this.moveMap.length) return 'rgba(128, 128, 128, 0.6)';
+
+        const [fromTower, toTower] = this.moveMap[direction];
 
         // Color code by source tower
         const colors = ['rgba(255, 100, 100, 0.6)', 'rgba(100, 255, 100, 0.6)', 'rgba(100, 100, 255, 0.6)'];
@@ -113,8 +117,7 @@ class HanoiGame extends AbstractGame {
     const moves = [];
     for (let dir = 0; dir < 6; dir++) {
       if (this.checkmove(dir)) {
-        const fromTower = Math.floor(dir / 3);
-        const toTower = dir % 3;
+        const [fromTower, toTower] = this.moveMap[dir];
         moves.push({ from: fromTower, to: toTower, direction: dir });
       }
     }
