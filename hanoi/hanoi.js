@@ -3,7 +3,7 @@ class HanoiGame extends AbstractGame {
   constructor() {
     super();
     this.towers = null;  // Array of 3 towers, each is an array of disks
-    this.numDisks = 5;   // Number of disks
+    this.numDisks = 6;   // Number of disks
     this.moveMap = [
       [0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1]
     ];
