@@ -1,4 +1,10 @@
-Game = function() {
+// IwahswapGame - Iwahswap puzzle implementation
+class IwahswapGame extends AbstractGame {
+  constructor() {
+    super();
+    this.board = null;
+    this.irod = null;
+  }
 }
 const rodtable=[-4,-3,-2,1,2,3];
 const ribtable=[
@@ -41,21 +47,21 @@ const findzero=function(board) {
   }
   return -1;
 }
-Game.prototype.init = function() {
+IwahswapGame.prototype.init = function() {
   this.irod = rod2i(1);
   this.board = new Array(6);
   for (var i = 0; i < this.board.length; i++) {
     this.board[i] = i;
   }
 }
-Game.prototype.clone = function() {
-  let g = new Game();
+IwahswapGame.prototype.clone = function() {
+  let g = new IwahswapGame();
   g.nmove = this.nmove;
   g.irod = this.irod;
   g.board = this.board.slice(0);
   return g;
 }
-Game.prototype.move = function(dir) {
+IwahswapGame.prototype.move = function(dir) {
   const b0 = this.board;   /* original board */
   const y0 = findzero(b0); /* position of zero */
   let game;
@@ -126,20 +132,44 @@ Game.prototype.move = function(dir) {
       return game;
   }
 }
-Game.prototype.checkmove = function(dir) {
+IwahswapGame.prototype.checkmove = function(dir) {
   let game2 = this.move(dir);
   return (game2 != 0);
 }
 
-Game.prototype.hash = function() {
+IwahswapGame.prototype.hash = function() {
   return this.board.join(',') + '-' + this.irod;
 }
 
-Game.prototype.isGoal = function() {
+IwahswapGame.prototype.isGoal = function() {
   for (let i = 0; i < 6; i++) {
     if (this.board[i] !== goalboard[i]) {
       return false;
     }
   }
   return true;
+}
+
+// Additional methods for AbstractGame interface
+IwahswapGame.prototype.getNumDirections = function() {
+  return 6; // Iwahswap has 6 possible move directions
+}
+
+IwahswapGame.prototype.getColorConfig = function() {
+  return {
+    nodeColor: (game) => {
+      // Color based on rod position
+      const rodValue = Math.abs(rodtable[game.irod]);
+      return label2color[rodValue];
+    },
+    edgeColor: (direction) => {
+      if (direction === 2 || direction === 3) {
+        return 'rgba(0, 150, 255, 0.8)'; // Blue for piece jumps
+      } else if (direction === 4 || direction === 5) {
+        return 'rgba(255, 255, 0, 0.8)'; // Yellow for rod rotations
+      } else {
+        return 'rgba(255, 255, 255, 0.3)'; // White for normal moves
+      }
+    }
+  };
 }

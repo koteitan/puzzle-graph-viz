@@ -30,13 +30,14 @@ window.addEventListener('load', () => {
     canvas = document.getElementById('board');
     ctx = canvas.getContext('2d');
     debugTextarea = document.getElementById('debugout');
-    
-    game = new Game();
+
+    game = new IwahswapGame();
     game.init();
     
-    // Initialize graph manager
+    // Initialize graph manager with color config from game
     graphManager = new GraphManager();
-    graphManager.init(document.getElementById('graph'), new Solver());
+    const colorConfig = game.getColorConfig();
+    graphManager.init(document.getElementById('graph'), new Solver(), colorConfig);
     
     // Set jump callback to handle jumping to nodes
     graphManager.setJumpCallback((gameState) => {

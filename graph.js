@@ -6,6 +6,7 @@ function GraphManager() {
   this.physicsInterval = null;
   this.solverInterval = null;
   this.visualizationInterval = null;
+  this.colorConfig = null; // Color configuration from game
   
   // View state for zoom and pan
   this.zoom = 0.1;  // Changed initial zoom to 0.1
@@ -35,10 +36,11 @@ function GraphManager() {
   this.shortestPath = [];
 }
 
-GraphManager.prototype.init = function(canvas, solver) {
+GraphManager.prototype.init = function(canvas, solver, colorConfig) {
   this.canvas = canvas;
   this.ctx = canvas.getContext('2d');
   this.solver = solver;
+  this.colorConfig = colorConfig || { nodeColor: () => '#ffffff', edgeColor: () => 'rgba(255, 255, 255, 0.3)' };
   
   // Add event listeners for mouse interaction
   this.setupMouseEvents();
@@ -430,17 +432,8 @@ GraphManager.prototype.draw = function() {
         // Get the direction of this edge
         const dir = node.edgedirs[neighbor.hash];
 
-        // Set color based on direction
-        if (dir === 2 || dir === 3) {
-          // Blue for dir 2,3 (piece moves)
-          this.ctx.strokeStyle = 'rgba(0, 150, 255, 0.8)';
-        } else if (dir === 4 || dir === 5) {
-          // Yellow for dir 4,5 (rod rotations)
-          this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
-        } else {
-          // White for dir 0,1 (normal moves)
-          this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-        }
+        // Set color based on direction using color config
+        this.ctx.strokeStyle = this.colorConfig.edgeColor(dir);
 
         this.ctx.beginPath();
         this.ctx.moveTo(centerX + node.x * scale, centerY + node.y * scale);
@@ -494,9 +487,8 @@ GraphManager.prototype.draw = function() {
     this.ctx.beginPath();
     this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
     
-    // Color based on current rod position using label2color
-    const rodValue = Math.abs(rodtable[node.game.irod]);
-    this.ctx.fillStyle = label2color[rodValue];
+    // Color based on game state using color config
+    this.ctx.fillStyle = this.colorConfig.nodeColor(node.game);
     
     this.ctx.fill();
     this.ctx.strokeStyle = '#333';

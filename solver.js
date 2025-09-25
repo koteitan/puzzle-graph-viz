@@ -58,11 +58,14 @@ Solver.prototype.step = function() {
     this.running = false;
     return false;
   }
-  
+
   const node = this.queue.shift();
-  
+
+  // Get number of directions from the game
+  const numDirections = node.game.getNumDirections();
+
   // Explore all possible moves from this node
-  for (let dir = 0; dir < 6; dir++) {
+  for (let dir = 0; dir < numDirections; dir++) {
     const nextGame = node.game.move(dir);
     if (nextGame) {
       const nextHash = nextGame.hash();
