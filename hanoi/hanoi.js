@@ -76,19 +76,10 @@ class HanoiGame extends AbstractGame {
   getColorConfig() {
     return {
       nodeColor: (game) => {
-        // Color based on how many disks are on the goal tower
-        const progress = game.towers[2].length;
-        const hue = (progress / this.numDisks) * 120; // Green when complete
-        return `hsl(${hue}, 70%, 50%)`;
+        return 'black';  // always black
       },
       edgeColor: (direction) => {
-        if (direction < 0 || direction >= this.moveMap.length) return 'rgba(128, 128, 128, 0.6)';
-
-        const [fromTower, toTower] = this.moveMap[direction];
-
-        // Color code by source tower
-        const colors = ['rgba(255, 100, 100, 0.6)', 'rgba(100, 255, 100, 0.6)', 'rgba(100, 100, 255, 0.6)'];
-        return colors[fromTower];
+        return 'white';  // always white
       }
     };
   }
