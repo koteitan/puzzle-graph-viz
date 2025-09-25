@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puzzle Hub - Abstract Game Framework</title>
+    <title>Puzzle Graph Visualizer</title>
     <style>
         body {
             margin: 0;
@@ -25,11 +25,7 @@
         h1 {
             margin: 0;
             font-size: 3em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: white;
         }
 
         .subtitle {
@@ -181,8 +177,8 @@
 </head>
 <body>
     <header>
-        <h1>Puzzle Hub</h1>
-        <p class="subtitle">Abstract Game Framework with BFS Solver & Graph Visualization</p>
+        <h1>Puzzle Graph Visualizer</h1>
+        <p class="subtitle">A framework for visualizing various puzzle state spaces as interactive graphs with BFS solver</p>
     </header>
 
     <main>
@@ -224,8 +220,9 @@
                     <p>Interactive force-directed graph showing state transitions with physics simulation</p>
                 </div>
                 <div class="feature-item">
-                    <h3>🎮 Interactive UI</h3>
-                    <p>Touch/mouse support, undo system, state jumping, and real-time visualization</p>
+                    <h3>📖 Add Your Puzzle</h3>
+                    <p>Learn how to extend the framework with your own puzzle implementation</p>
+                    <p><a href="https://github.com/koteitan/puzzle-graph-viz/blob/main/HowToAddYourPuzzle.md" target="_blank">View Documentation</a></p>
                 </div>
             </div>
         </div>
@@ -233,11 +230,11 @@
 
     <footer>
         <p>
-            This puzzle framework demonstrates abstract base classes and modular architecture in JavaScript.<br>
-            Each puzzle implements AbstractGame and AbstractRenderer interfaces for consistent behavior.
+            This framework enables interactive visualization of various puzzle state spaces as graphs.<br>
+            Each puzzle implements AbstractGame and AbstractRenderer interfaces, with automatic BFS solving and graph visualization.
         </p>
         <p>
-            Developed as part of an exploration into puzzle game architecture and AI solving techniques.
+            Explore puzzle complexity through visual graph representation and discover optimal solution paths.
         </p>
     </footer>
 </body>
