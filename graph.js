@@ -421,13 +421,27 @@ GraphManager.prototype.draw = function() {
   const scale = 1.0;
   
   // Draw edges (only for visible nodes)
-  this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
   this.ctx.lineWidth = 1 / this.zoom;  // Constant line width regardless of zoom
-  
+
   this.solver.visibleGraph.forEach(node => {
     node.edgelist.forEach(neighbor => {
       // Only draw edge if neighbor is also visible
       if (this.solver.visibleGraph.has(neighbor.hash)) {
+        // Get the direction of this edge
+        const dir = node.edgedirs[neighbor.hash];
+
+        // Set color based on direction
+        if (dir === 2 || dir === 3) {
+          // Blue for dir 2,3 (piece moves)
+          this.ctx.strokeStyle = 'rgba(0, 150, 255, 0.8)';
+        } else if (dir === 4 || dir === 5) {
+          // Yellow for dir 4,5 (rod rotations)
+          this.ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
+        } else {
+          // White for dir 0,1 (normal moves)
+          this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        }
+
         this.ctx.beginPath();
         this.ctx.moveTo(centerX + node.x * scale, centerY + node.y * scale);
         this.ctx.lineTo(centerX + neighbor.x * scale, centerY + neighbor.y * scale);
@@ -439,17 +453,33 @@ GraphManager.prototype.draw = function() {
   // Draw shortest path in bright green if solver mode is active
   if (this.shortestPath && this.shortestPath.length > 1) {
     this.ctx.strokeStyle = '#00FF00';  // Bright green
-    this.ctx.lineWidth = 3 / this.zoom;  // Thicker line for path
-    
+    this.ctx.lineWidth = 1.5 / this.zoom;  // Thinner line for path
+
     for (let i = 0; i < this.shortestPath.length - 1; i++) {
       const node = this.shortestPath[i];
       const nextNode = this.shortestPath[i + 1];
-      
+
       // Only draw if both nodes are visible
       if (this.solver.visibleGraph.has(node.hash) && this.solver.visibleGraph.has(nextNode.hash)) {
+        // Calculate the vector from node to nextNode
+        const dx = nextNode.x - node.x;
+        const dy = nextNode.y - node.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Calculate perpendicular vector for offset
+        const perpX = -dy / dist * 2 / this.zoom;  // Perpendicular x component
+        const perpY = dx / dist * 2 / this.zoom;   // Perpendicular y component
+
+        // Draw first green line (offset to one side)
         this.ctx.beginPath();
-        this.ctx.moveTo(centerX + node.x * scale, centerY + node.y * scale);
-        this.ctx.lineTo(centerX + nextNode.x * scale, centerY + nextNode.y * scale);
+        this.ctx.moveTo(centerX + (node.x + perpX) * scale, centerY + (node.y + perpY) * scale);
+        this.ctx.lineTo(centerX + (nextNode.x + perpX) * scale, centerY + (nextNode.y + perpY) * scale);
+        this.ctx.stroke();
+
+        // Draw second green line (offset to the other side)
+        this.ctx.beginPath();
+        this.ctx.moveTo(centerX + (node.x - perpX) * scale, centerY + (node.y - perpY) * scale);
+        this.ctx.lineTo(centerX + (nextNode.x - perpX) * scale, centerY + (nextNode.y - perpY) * scale);
         this.ctx.stroke();
       }
     }

@@ -3,6 +3,7 @@ function GraphNode(game, depth = 0) {
   this.game = game;
   this.hash = game.hash();
   this.edgelist = [];
+  this.edgedirs = {}; // Map from neighbor hash to move direction
   this.type = 'normal'; // 'start', 'goal', 'normal'
   this.depth = depth; // Distance from start node
   this.goalcount = -1; // Distance to goal node (-1 means not calculated yet)
@@ -71,6 +72,9 @@ Solver.prototype.step = function() {
         if (!node.edgelist.includes(existingNode)) {
           node.edgelist.push(existingNode);
           existingNode.edgelist.push(node);
+          // Store the direction of the move
+          node.edgedirs[nextHash] = dir;
+          existingNode.edgedirs[node.hash] = dir;
         }
       } else {
         // Found a new node to add! Set depth as current node's depth + 1
@@ -94,6 +98,9 @@ Solver.prototype.step = function() {
         // Add edge (bidirectional)
         node.edgelist.push(nextNode);
         nextNode.edgelist.push(node);
+        // Store the direction of the move
+        node.edgedirs[nextHash] = dir;
+        nextNode.edgedirs[node.hash] = dir;
         
       }
     }
