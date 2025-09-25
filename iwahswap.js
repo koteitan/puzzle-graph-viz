@@ -173,3 +173,35 @@ IwahswapGame.prototype.getColorConfig = function() {
     }
   };
 }
+
+// Game logic methods moved from main.js
+
+IwahswapGame.prototype.checkGoal = function() {
+  for (let i = 0; i < 6; i++) {
+    if (this.board[i] !== goalboard[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+IwahswapGame.prototype.getMovableCells = function() {
+  const blankIndex = findzero(this.board);
+  const movable = [];
+
+  // Check each direction
+  if (this.checkmove(0)) movable.push(blankIndex - 1);
+  if (this.checkmove(1)) movable.push(blankIndex + 1);
+  if (this.checkmove(2)) movable.push(blankIndex + 2);
+  if (this.checkmove(3)) movable.push(blankIndex - 2);
+
+  return movable.filter(i => i >= 0 && i < 6);
+}
+
+IwahswapGame.prototype.getInitialBoard = function() {
+  return initboard.slice();
+}
+
+IwahswapGame.prototype.getGoalBoard = function() {
+  return goalboard.slice();
+}
