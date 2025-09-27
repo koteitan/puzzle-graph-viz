@@ -67,12 +67,12 @@ window.addEventListener('load', () => {
     canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
     canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
     
-    document.getElementById('undoButton').addEventListener('click', handleUndo);
-    document.getElementById('resetButton').addEventListener('click', handleReset);
-    document.getElementById('graphButton').addEventListener('click', handleGraph);
-    document.getElementById('solverButton').addEventListener('click', handleSolver);
-    document.getElementById('jumpButton').addEventListener('click', handleJumpToggle);
-    document.getElementById('dragButton').addEventListener('click', handleDragToggle);
+    document.getElementById('undoButton').addEventListener('click', handleUndoButton);
+    document.getElementById('resetButton').addEventListener('click', handleResetButton);
+    document.getElementById('graphButton').addEventListener('click', handleGraphButton);
+    document.getElementById('solverButton').addEventListener('click', handleSolverButton);
+    document.getElementById('jumpButton').addEventListener('click', handleJumpButton);
+    document.getElementById('dragButton').addEventListener('click', handleDragButton);
     window.addEventListener('resize', () => {
         resizeCanvas();
         draw();
@@ -116,7 +116,7 @@ function handleCanvasClick(event) {
 
 // Click handling functions moved to IwahswapRenderer
 
-function handleUndo() {
+function handleUndoButton() {
     if (history.length > 0) {
         game = history.pop();
         renderer.handleUndo();
@@ -127,7 +127,7 @@ function handleUndo() {
     }
 }
 
-function handleReset() {
+function handleResetButton() {
     // Save current state for undo
     const initialBoard = game.getInitialBoard();
     if (JSON.stringify(game.board) !== JSON.stringify(initialBoard)) {
@@ -150,7 +150,7 @@ function checkGoal() {
     }
 }
 
-function handleGraph() {
+function handleGraphButton() {
     const gameArea = document.querySelector('.game-area');
     const graphCanvas = document.getElementById('graph');
     
@@ -186,7 +186,7 @@ function handleGraph() {
     draw();
 }
 
-function handleSolver() {
+function handleSolverButton() {
     // Auto-solve: move one step closer to goal
     if (!graphManager || !graphManager.solver || !graphManager.solver.graph) {
         console.log('Solver not ready');
@@ -245,7 +245,7 @@ function handleSolver() {
     }
 }
 
-function handleJumpToggle() {
+function handleJumpButton() {
     jumpMode = !jumpMode;
     dragMode = false; // Turn off drag mode when jump mode is turned on
     
@@ -270,7 +270,7 @@ function handleJumpToggle() {
     }
 }
 
-function handleDragToggle() {
+function handleDragButton() {
     dragMode = !dragMode;
     jumpMode = false; // Turn off jump mode when drag mode is turned on
     
