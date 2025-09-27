@@ -65,16 +65,6 @@ class AbstractRenderer {
     };
   }
 
-  // Handle undo action (can be overridden for renderer-specific cleanup)
-  handleUndo() {
-    // Default implementation - no special handling needed
-  }
-
-  // Handle reset action (can be overridden for renderer-specific cleanup)
-  handleReset() {
-    // Default implementation - no special handling needed
-  }
-
   // Resize both board canvas and graph canvas
   resizeAllCanvases() {
     const gameArea = document.querySelector('.game-area');

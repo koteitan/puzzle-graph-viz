@@ -80,18 +80,39 @@ This framework allows you to easily add new puzzles to the system. Each puzzle c
    }
    ```
 
-4. **Create HTML file** (`mypuzzle/index.html`) following the pattern of existing puzzles
+4. **Copy main.js** to `mypuzzle/main.js` and modify it for your puzzle:
+   ```javascript
+   window.addEventListener('load', () => {
+       game = new MyPuzzleGame();
+       game.init();
+       renderer = new MyPuzzleRenderer();
+   ```
 
-5. **Update main index.html** to add your puzzle to the grid
+5. **Copy index.html** from `hanoi/index.html` to `mypuzzle/index.html`) and modify it to include your scripts:
+   ```html
+   <script src="../abstract-game.js"></script>
+   <script src="../abstract-renderer.js"></script>
+   <script src="mypuzzle.js"></script>
+   <script src="mypuzzle-renderer.js"></script>
+   <script src="../solver.js"></script>
+   <script src="../graph.js"></script>
+   <script src="../ui-controller.js"></script>
+   <script src="main.js"></script>
+   ```
 
 ## Architecture
 
-### Abstract Classes
+### Shared Components
 
-- **AbstractGame**: Defines the puzzle logic interface
-- **AbstractRenderer**: Handles drawing and user interaction
-- **Solver**: Generic BFS solver that works with any AbstractGame
-- **GraphManager**: Visualizes state space as interactive graph
+- **AbstractGame**: Defines the puzzle logic interface (in root directory)
+- **AbstractRenderer**: Handles drawing and user interaction (in root directory)
+- **Solver**: Generic BFS solver that works with any AbstractGame (in root directory)
+- **GraphManager**: Visualizes state space as interactive graph (in root directory)
+- **UIController**: Manages all common UI interactions (in root directory)
+  - Global variables (game, renderer, canvas, ctx, history, graphManager, etc.)
+  - Button handlers (undo, reset, graph, solver, jump, drag)
+  - Canvas click handling and touch events
+  - `initUIController()`: Initializes all UI components (called from puzzle's main.js)
 
 ### Key Methods
 
@@ -134,14 +155,33 @@ See the existing implementations:
 ## File Structure
 
 ```
-your-puzzle/
-├── index.html              # Main page
-├── style.css               # Styling
-├── your-puzzle.js          # Game logic (extends AbstractGame)
-├── your-puzzle-renderer.js # Renderer (extends AbstractRenderer)
-├── main.js                 # UI handling (copy from existing puzzle)
-└── [shared files]          # Abstract classes, solver, graph manager
+./                          # Root directory (shared files)
+├── abstract-game.js        # Abstract game class
+├── abstract-renderer.js    # Abstract renderer class
+├── solver.js               # BFS solver
+├── graph.js                # Graph visualization
+├── ui-controller.js        # Common UI controller
+├── index.html              # Main puzzle list page
+│
+└── your-puzzle/            # Your puzzle directory
+    ├── index.html          # Puzzle page (includes scripts in correct order)
+    ├── style.css           # Puzzle-specific styling
+    ├── your-puzzle.js      # Game logic (extends AbstractGame)
+    ├── your-puzzle-renderer.js # Renderer (extends AbstractRenderer)
+    └── main.js             # Puzzle initialization (5-15 lines)
 ```
+
+### Script Loading Order in HTML
+
+**Critical**: Scripts must be loaded in this exact order:
+1. `abstract-game.js` - Base game class
+2. `abstract-renderer.js` - Base renderer class
+3. `your-puzzle.js` - Your game implementation
+4. `your-puzzle-renderer.js` - Your renderer implementation
+5. `solver.js` - Solver algorithm
+6. `graph.js` - Graph visualization
+7. `ui-controller.js` - **Must come before main.js**
+8. `main.js` - Your puzzle initialization
 
 ## Tips
 
@@ -150,5 +190,6 @@ your-puzzle/
 3. **Hash Function**: Ensure different states have different hashes
 4. **Color Coding**: Use meaningful colors for visualization
 5. **Click Handling**: Support both direct moves and 2-click selection
+6. **Keep main.js Minimal**: All common UI logic is in ui-controller.js - only add puzzle-specific handlers in main.js
 
 The framework handles all the complex parts (BFS solving, graph physics, UI controls) - you just focus on your puzzle's unique logic!
