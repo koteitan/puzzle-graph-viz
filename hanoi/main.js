@@ -31,11 +31,14 @@ window.addEventListener('load', () => {
     game = new HanoiGame();
     game.init();
     renderer = new HanoiRenderer();
-    
+
     // Initialize graph manager with color config from game
     graphManager = new GraphManager();
     const colorConfig = game.getColorConfig();
     graphManager.init(document.getElementById('graph'), new Solver(), colorConfig);
+
+    // Initialize renderer with canvas and graph manager
+    renderer.init(canvas, ctx, graphManager);
     
     // Set jump callback to handle jumping to nodes
     graphManager.setJumpCallback((gameState) => {
@@ -48,13 +51,13 @@ window.addEventListener('load', () => {
         // Update display
         draw();
         checkGoal();
-        
+
         // Update graph visualization
         if (graphManager) {
             graphManager.updateCurrentState(game);
         }
     });
-    
+
     resizeCanvas();
     draw();
     
@@ -77,24 +80,11 @@ window.addEventListener('load', () => {
 });
 
 function resizeCanvas() {
-    const gameArea = document.querySelector('.game-area');
-
-    // Use renderer for canvas resizing
-    renderer.resizeCanvas(canvas, gameArea);
-
-    if (graphManager && graphManager.canvas) {
-        renderer.resizeCanvas(graphManager.canvas, gameArea);
-    }
+    renderer.resizeAllCanvases();
 }
 
 function draw() {
-    // Use renderer for drawing
-    renderer.draw(canvas, ctx, game);
-
-    // Draw graph
-    if (graphManager) {
-        graphManager.draw();
-    }
+    renderer.drawAll(game);
 }
 
 // Rendering functions moved to IwahswapRenderer
@@ -245,7 +235,7 @@ function handleSolver() {
         // Update display
         draw();
         checkGoal();
-        
+
         // Update graph visualization
         if (graphManager) {
             graphManager.updateCurrentState(game);

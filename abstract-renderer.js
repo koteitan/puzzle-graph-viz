@@ -4,13 +4,18 @@ class AbstractRenderer {
     if (this.constructor === AbstractRenderer) {
       throw new Error("Abstract class AbstractRenderer cannot be instantiated directly");
     }
+    this.graphManager = null;
+    this.canvas = null;
+    this.ctx = null;
   }
 
   // Abstract methods that must be implemented by subclasses
 
-  // Initialize the renderer
-  init() {
-    // Default implementation - can be overridden
+  // Initialize the renderer with canvas and context
+  init(canvas, ctx, graphManager) {
+    this.canvas = canvas;
+    this.ctx = ctx;
+    this.graphManager = graphManager;
   }
 
   // Draw the game state on the canvas
@@ -68,5 +73,22 @@ class AbstractRenderer {
   // Handle reset action (can be overridden for renderer-specific cleanup)
   handleReset() {
     // Default implementation - no special handling needed
+  }
+
+  // Resize both board canvas and graph canvas
+  resizeAllCanvases() {
+    const gameArea = document.querySelector('.game-area');
+    this.resizeCanvas(this.canvas, gameArea);
+    if (this.graphManager && this.graphManager.canvas) {
+      this.resizeCanvas(this.graphManager.canvas, gameArea);
+    }
+  }
+
+  // Draw both board and graph
+  drawAll(game) {
+    this.draw(this.canvas, this.ctx, game);
+    if (this.graphManager) {
+      this.graphManager.draw();
+    }
   }
 }
