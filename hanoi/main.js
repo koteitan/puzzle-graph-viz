@@ -74,32 +74,7 @@ window.addEventListener('load', () => {
         resizeCanvas();
         draw();
     });
-
-    // Initialize button states
-    initializeButtonStates();
 });
-
-function initializeButtonStates() {
-    const jumpButton = document.getElementById('jumpButton');
-    const dragButton = document.getElementById('dragButton');
-
-    // Set initial styles based on current mode states
-    if (jumpMode) {
-        jumpButton.style.backgroundColor = '#4CAF50';
-        jumpButton.style.color = 'white';
-    } else {
-        jumpButton.style.backgroundColor = '';
-        jumpButton.style.color = '';
-    }
-
-    if (dragMode) {
-        dragButton.style.backgroundColor = '#4CAF50';
-        dragButton.style.color = 'white';
-    } else {
-        dragButton.style.backgroundColor = '';
-        dragButton.style.color = '';
-    }
-}
 
 function resizeCanvas() {
     const gameArea = document.querySelector('.game-area');
