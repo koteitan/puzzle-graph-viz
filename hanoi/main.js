@@ -118,7 +118,7 @@ function handleCanvasClick(event) {
         if (graphManager) {
             graphManager.updateCurrentState(game);
         }
-    } else if (result.selectionChanged) {
+    } else if (result.selectionChanged === true) {
         // Just redraw to show selection changes
         draw();
     }
@@ -129,8 +129,7 @@ function handleCanvasClick(event) {
 function handleUndo() {
     if (history.length > 0) {
         game = history.pop();
-        // Reset selection on undo
-        renderer.selectedTower = -1;
+        renderer.handleUndo();
         if (graphManager) {
             graphManager.updateCurrentState(game);
         }
@@ -141,13 +140,12 @@ function handleUndo() {
 function handleReset() {
     // Save current state for undo
     const initialBoard = game.getInitialBoard();
-    if (JSON.stringify(game.towers) !== JSON.stringify(initialBoard)) {
+    if (JSON.stringify(game.board) !== JSON.stringify(initialBoard)) {
         history.push(game.clone());
     }
 
     game.init();
-    // Reset selection on reset
-    renderer.selectedTower = -1;
+    renderer.handleReset();
     if (graphManager) {
         graphManager.updateCurrentState(game);
     }
@@ -260,10 +258,10 @@ function handleSolver() {
 function handleJumpToggle() {
     jumpMode = !jumpMode;
     dragMode = false; // Turn off drag mode when jump mode is turned on
-
+    
     const jumpButton = document.getElementById('jumpButton');
     const dragButton = document.getElementById('dragButton');
-
+    
     if (jumpMode) {
         jumpButton.style.backgroundColor = '#4CAF50';
         jumpButton.style.color = 'white';
@@ -271,11 +269,11 @@ function handleJumpToggle() {
         jumpButton.style.backgroundColor = '';
         jumpButton.style.color = '';
     }
-
+    
     // Reset drag button appearance
     dragButton.style.backgroundColor = '';
     dragButton.style.color = '';
-
+    
     // Update graph manager mode
     if (graphManager) {
         graphManager.setMode(jumpMode ? 'jump' : 'normal');
@@ -285,10 +283,10 @@ function handleJumpToggle() {
 function handleDragToggle() {
     dragMode = !dragMode;
     jumpMode = false; // Turn off jump mode when drag mode is turned on
-
+    
     const jumpButton = document.getElementById('jumpButton');
     const dragButton = document.getElementById('dragButton');
-
+    
     if (dragMode) {
         dragButton.style.backgroundColor = '#4CAF50';
         dragButton.style.color = 'white';
@@ -296,11 +294,11 @@ function handleDragToggle() {
         dragButton.style.backgroundColor = '';
         dragButton.style.color = '';
     }
-
+    
     // Reset jump button appearance
     jumpButton.style.backgroundColor = '';
     jumpButton.style.color = '';
-
+    
     // Update graph manager mode
     if (graphManager) {
         graphManager.setMode(dragMode ? 'drag' : 'normal');

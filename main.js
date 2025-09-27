@@ -118,6 +118,9 @@ function handleCanvasClick(event) {
         if (graphManager) {
             graphManager.updateCurrentState(game);
         }
+    } else if (result.selectionChanged === true) {
+        // Just redraw to show selection changes
+        draw();
     }
 }
 
@@ -126,6 +129,7 @@ function handleCanvasClick(event) {
 function handleUndo() {
     if (history.length > 0) {
         game = history.pop();
+        renderer.handleUndo();
         if (graphManager) {
             graphManager.updateCurrentState(game);
         }
@@ -141,6 +145,7 @@ function handleReset() {
     }
 
     game.init();
+    renderer.handleReset();
     if (graphManager) {
         graphManager.updateCurrentState(game);
     }

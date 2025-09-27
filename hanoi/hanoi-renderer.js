@@ -270,4 +270,12 @@ class HanoiRenderer extends AbstractRenderer {
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
   }
+
+  handleUndo() {
+    this.selectedTower = -1;
+  }
+
+  handleReset() {
+    this.selectedTower = -1;
+  }
 }
