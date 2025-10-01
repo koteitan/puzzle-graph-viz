@@ -39,7 +39,8 @@ The classic Tower of Hanoi puzzle with 6 disks. Move all disks from the first to
 - **Extensible**: Easy to add new puzzles (see HowToAddYourPuzzle.md) 
 
 ---
-# Number of moves calculator
+# Iwahswap Number of moves calculator
+- [iwahswap.py](https://github.com/koteitan/puzzle-graph-viz/blob/main/python/iwahswap.py)
 
 ## What is this code
 I estimated the number of moves for the k pieces alignment from one side to the other side in the all n pieces as follows.
