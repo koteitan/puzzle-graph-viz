@@ -1,24 +1,42 @@
-# Programs for Iwahswap
+# Puzzle Graph Visualizer
 
-## What is Iwahswap
-Iwahswap is a puzzle developed in a creative exchange between Iwahiro (Hirokazu Iwasawa), Goetz Schwandtner, Bram Cohen and Oscar van Deventer.
+A framework for visualizing various puzzle state spaces as interactive graphs with BFS solver.
+
+## Overview
+
+Puzzle Graph Visualizer is a web-based framework that allows you to:
+- Play various puzzles interactively
+- Visualize the complete state space as a force-directed graph
+- Explore optimal solutions using BFS (Breadth-First Search)
+- Jump to any state in the graph
+- See the shortest path from any state to the goal
+
+## Live Demo
+
+- Main site: https://koteitan.github.io/puzzle-graph-viz/
+- Iwahswap Simulator: https://koteitan.github.io/puzzle-graph-viz/iwahswap/
+- Hanoi Tower: https://koteitan.github.io/puzzle-graph-viz/hanoi/
+
+## Implemented Puzzles
+
+### Iwahswap
+A puzzle developed in a creative exchange between Iwahiro (Hirokazu Iwasawa), Goetz Schwandtner, Bram Cohen and Oscar van Deventer.
 - https://www.youtube.com/watch?v=3rFQOCd4fXE
-- https://twistypuzzles.com/forum/viewtopic.php?t=40126%29
+- https://twistypuzzles.com/forum/viewtopic.php?t=40126
 
 Iwahswap is said to have a hyper-exponential number of moves for n pieces to solve.
 
-## things I made
+### Hanoi Tower
+The classic Tower of Hanoi puzzle with 6 disks. Move all disks from the first tower to the last, following the rule that larger disks cannot be placed on smaller ones.
 
-- Iwahswap Simulator
-  - https://koteitan.github.io/iwahswap/
-- Number of moves calculator
-  - https://github.com/koteitan/iwahswap/blob/main/iwahswap.py
+## Framework Features
 
----
-
-# Iwahswap Simulator
-
-Iwahswap Simulator is a simulator of Iwahswap puzzle. It is implemented in JavaScript and runs in web browsers. 
+- **Abstract Architecture**: Modular design with AbstractGame and AbstractRenderer base classes
+- **BFS Solver**: Breadth-first search explores the complete state space
+- **Interactive Graph**: Force-directed graph visualization with physics simulation
+- **Graph Navigation**: Jump to any state, drag nodes, zoom and pan
+- **Auto-solver**: Step-by-step optimal solution guidance
+- **Extensible**: Easy to add new puzzles (see HowToAddYourPuzzle.md) 
 
 ---
 # Number of moves calculator
@@ -38,21 +56,21 @@ This code is a python script to calculate them.
 
 ## Usage
 ```bash
-./iwahswap.py <n> <k>
-./hanoi.py <n> <n>
+python/iwahswap.py <n> <k>
+python/hanoi.py <n> <n>
 ```
 where n is the number of pieces and k is the maximum number of the recurrence relations to be calculated.
 
 ## example
 ```bash
-./iwahswap.py 5 4
+python/iwahswap.py 5 4
 
 M(1) = 4 = 4
 M(2) = 3*4 + 3*1 = 15
 M(3) = 2*3*4 + 3*1 + 2*1 + 3*4 + 3*1 = 47
 M(4) = 1*2*3*4 + 3*1 + 2*1 + 1*3*4 + 3*1 + 1*1 = 48
 
-./iwahswap.py 6 5
+python/iwahswap.py 6 5
 
 M(1) = 5 = 5
 M(2) = 4*5 + 4*1 + 5 = 29
@@ -60,7 +78,7 @@ M(3) = 3*4*5 + 4*1 + 3*5 + 3*1 = 90
 M(4) = 2*3*4*5 + 4*1 + 3*5 + 3*1 + 2*1 + 3*4*5 + 4*1 + 3*5 + 3*1 = 272
 M(5) = 1*2*3*4*5 + 4*1 + 3*5 + 3*1 + 2*1 + 1*3*4*5 + 4*1 + 3*5 + 3*1 + 1*1 = 273
 
-./iwahswap.py 7 6
+python/iwahswap.py 7 6
 
 M(1) = 6 = 6
 M(2) = 5*6 + 5*1 = 35
@@ -69,7 +87,7 @@ M(4) = 3*4*5*6 + 5*1 + 4*1 + 3*5*6 + 5*1 + 3*1 = 540
 M(5) = 2*3*4*5*6 + 5*1 + 4*1 + 3*5*6 + 5*1 + 3*1 + 2*1 + 3*4*5*6 + 5*1 + 4*1 + 3*5*6 + 5*1 + 3*1 = 1622
 M(6) = 1*2*3*4*5*6 + 5*1 + 4*1 + 3*5*6 + 5*1 + 3*1 + 2*1 + 1*3*4*5*6 + 5*1 + 4*1 + 3*5*6 + 5*1 + 3*1 + 1*1 = 1623
 
-./hanoi.py 5 5
+python/hanoi.py 5 5
 
 M(1) = 1 = 1
 M(2) = 2*1 + 1 = 3
@@ -82,7 +100,7 @@ M(5) = 2*2*2*2*1 + 2*1 + 2*1 + 2*1 + 1 = 31
 Add and Mul functions by sympy are useful to expand the recurrence relations to keep the factorial expressions. This code uses them to expand the expressions into standard form.
 
 ### expand.py
-expand.py is a useful library to observe the factorial patterns given by the of the recurrence relations.
+python/expand.py is a useful library to observe the factorial patterns given by the of the recurrence relations.
 - apply_distributive_law(): apply the distributive law to the expression
 - pretty_print(): pretty print the expression
 
