@@ -1,10 +1,40 @@
-// HanoiRenderer - Hanoi Tower puzzle renderer implementation
+/**
+ * HanoiRenderer - Hanoi Tower puzzle renderer implementation
+ *
+ * Renders the classic Tower of Hanoi puzzle with 3 towers and multiple disks.
+ *
+ * Features:
+ * - Visual representation of 3 towers with posts and bases
+ * - Colored disks with size-based rainbow coloring
+ * - Two-click interaction model: select source tower, then destination tower
+ * - Intelligent highlighting of valid moves
+ *
+ * Interaction model:
+ * - Yellow highlight: Towers with movable disks (no selection)
+ * - Blue highlight: Selected source tower
+ * - Green highlight: Valid destination towers (when source is selected)
+ */
 class HanoiRenderer extends AbstractRenderer {
+  /**
+   * Constructor
+   * Initializes the renderer with no tower selected
+   */
   constructor() {
     super();
     this.selectedTower = -1; // -1 means no tower selected, 0-2 means tower index
   }
 
+  // ============================================================================
+  // Main Rendering
+  // ============================================================================
+
+  /**
+   * Draw the complete Hanoi Tower puzzle state
+   *
+   * @param {HTMLCanvasElement} canvas - The canvas to draw on
+   * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
+   * @param {HanoiGame} game - The Hanoi game state
+   */
   draw(canvas, ctx, game) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -13,6 +43,12 @@ class HanoiRenderer extends AbstractRenderer {
     this.drawHighlights(ctx, game, canvas.width, canvas.height, constants);
   }
 
+  /**
+   * Get layout constants for rendering
+   * Defines dimensions for towers, disks, and spacing
+   *
+   * @returns {Object} Layout constants object with all dimension properties
+   */
   getLayoutConstants() {
     return {
       TOWER_WIDTH: 140,      // Width of each tower area
@@ -27,6 +63,20 @@ class HanoiRenderer extends AbstractRenderer {
     };
   }
 
+  // ============================================================================
+  // Tower and Disk Rendering
+  // ============================================================================
+
+  /**
+   * Draw all three towers with their disks
+   * Renders bases, posts, disks, and labels for each tower
+   *
+   * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
+   * @param {HanoiGame} game - The game state
+   * @param {number} canvasWidth - Width of the canvas
+   * @param {number} canvasHeight - Height of the canvas
+   * @param {Object} constants - Layout constants from getLayoutConstants()
+   */
   drawTowers(ctx, game, canvasWidth, canvasHeight, constants) {
     const totalWidth = 3 * constants.TOWER_WIDTH + 2 * constants.TOWER_SPACING;
     const startX = (canvasWidth - totalWidth) / 2;
@@ -45,7 +95,7 @@ class HanoiRenderer extends AbstractRenderer {
         constants.BASE_HEIGHT
       );
 
-      // Draw tower post
+      // Draw tower post (vertical rod)
       ctx.fillStyle = '#8B4513';  // Brown
       ctx.fillRect(
         towerCenterX - constants.POST_WIDTH / 2,
@@ -54,21 +104,21 @@ class HanoiRenderer extends AbstractRenderer {
         constants.TOWER_HEIGHT - constants.BASE_HEIGHT
       );
 
-      // Draw disks
+      // Draw disks on this tower (from bottom to top)
       const disks = game.getTowerDisks(towerIndex);
       for (let diskIndex = 0; diskIndex < disks.length; diskIndex++) {
         const diskSize = disks[diskIndex];
         const diskY = startY + constants.TOWER_HEIGHT - constants.BASE_HEIGHT - (diskIndex + 1) * constants.DISK_HEIGHT;
 
-        // Calculate disk width based on size
+        // Calculate disk width based on size (larger size = wider disk)
         const diskWidthRatio = (diskSize - 1) / (game.numDisks - 1);
         const diskWidth = constants.DISK_MIN_WIDTH + diskWidthRatio * (constants.DISK_MAX_WIDTH - constants.DISK_MIN_WIDTH);
 
-        // Color based on disk size (rainbow colors)
+        // Color based on disk size (rainbow colors from red to purple)
         const hue = ((diskSize - 1) / game.numDisks) * 300;
         ctx.fillStyle = `hsl(${hue}, 80%, 60%)`;
 
-        // Draw disk
+        // Draw disk rectangle
         const diskX = towerCenterX - diskWidth / 2;
         ctx.fillRect(diskX, diskY, diskWidth, constants.DISK_HEIGHT - 2);
 
@@ -77,7 +127,7 @@ class HanoiRenderer extends AbstractRenderer {
         ctx.lineWidth = 2;
         ctx.strokeRect(diskX, diskY, diskWidth, constants.DISK_HEIGHT - 2);
 
-        // Draw disk number
+        // Draw disk number (shows disk size)
         ctx.fillStyle = 'white';
         ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'center';
@@ -85,7 +135,7 @@ class HanoiRenderer extends AbstractRenderer {
         ctx.fillText(diskSize.toString(), towerCenterX, diskY + constants.DISK_HEIGHT / 2 - 1);
       }
 
-      // Draw tower label
+      // Draw tower label at bottom
       ctx.fillStyle = 'black';
       ctx.font = 'bold 20px Arial';
       ctx.textAlign = 'center';
@@ -94,6 +144,25 @@ class HanoiRenderer extends AbstractRenderer {
     }
   }
 
+  // ============================================================================
+  // Highlight Rendering
+  // ============================================================================
+
+  /**
+   * Draw highlights around interactive elements
+   * Shows which towers/disks can be interacted with based on current selection state
+   *
+   * Highlight colors:
+   * - Yellow: Source towers with movable disks (no tower selected)
+   * - Blue: Currently selected source tower
+   * - Green: Valid destination towers (when source tower is selected)
+   *
+   * @param {CanvasRenderingContext2D} ctx - The 2D rendering context
+   * @param {HanoiGame} game - The game state
+   * @param {number} canvasWidth - Width of the canvas
+   * @param {number} canvasHeight - Height of the canvas
+   * @param {Object} constants - Layout constants from getLayoutConstants()
+   */
   drawHighlights(ctx, game, canvasWidth, canvasHeight, constants) {
     const validMoves = game.getValidMoves();
     const totalWidth = 3 * constants.TOWER_WIDTH + 2 * constants.TOWER_SPACING;
@@ -109,6 +178,7 @@ class HanoiRenderer extends AbstractRenderer {
           const fromTowerX = startX + towerIndex * (constants.TOWER_WIDTH + constants.TOWER_SPACING);
           const fromTowerCenterX = fromTowerX + constants.TOWER_WIDTH / 2;
 
+          // Get the top disk (the one that would be moved)
           const topDiskSize = disks[disks.length - 1];
           const diskY = startY + constants.TOWER_HEIGHT - constants.BASE_HEIGHT - disks.length * constants.DISK_HEIGHT;
 
@@ -151,7 +221,7 @@ class HanoiRenderer extends AbstractRenderer {
         );
       }
 
-      // Highlight valid destination towers
+      // Highlight valid destination towers in green
       const validDestinations = validMoves
         .filter(move => move.from === this.selectedTower)
         .map(move => move.to);
@@ -173,6 +243,26 @@ class HanoiRenderer extends AbstractRenderer {
     }
   }
 
+  // ============================================================================
+  // Click Handling
+  // ============================================================================
+
+  /**
+   * Handle canvas click events
+   * Implements two-click interaction model for Hanoi puzzle
+   *
+   * First click: Select source tower (must have disks and valid moves)
+   * Second click:
+   * - Same tower: Deselect
+   * - Valid destination: Execute move
+   * - Invalid destination but valid source: Change selection
+   * - Invalid destination: Deselect
+   *
+   * @param {MouseEvent|TouchEvent} event - The click or touch event
+   * @param {HanoiGame} game - The current game state
+   * @param {HTMLCanvasElement} canvas - The canvas element
+   * @returns {{moved: boolean, newGame: HanoiGame|null, selectionChanged?: boolean}}
+   */
   handleCanvasClick(event, game, canvas) {
     const rect = canvas.getBoundingClientRect();
 
@@ -244,6 +334,17 @@ class HanoiRenderer extends AbstractRenderer {
     }
   }
 
+  // ============================================================================
+  // Canvas Sizing
+  // ============================================================================
+
+  /**
+   * Handle canvas resize with custom logic for Hanoi towers
+   * Overrides default implementation to optimize for horizontal tower layout
+   *
+   * @param {HTMLCanvasElement} canvas - The canvas to resize
+   * @param {HTMLElement} gameArea - The game area container element
+   */
   resizeCanvas(canvas, gameArea) {
     // Custom resize logic for Hanoi towers
     const isGraphVisible = gameArea.classList.contains('graph-visible');
@@ -271,10 +372,24 @@ class HanoiRenderer extends AbstractRenderer {
     canvas.height = canvasHeight;
   }
 
+  // ============================================================================
+  // Selection Management (Legacy Methods)
+  // ============================================================================
+
+  /**
+   * Handle undo action
+   * Resets tower selection when user undoes a move
+   * (Legacy method, now handled by event listener in main.js)
+   */
   handleUndo() {
     this.selectedTower = -1;
   }
 
+  /**
+   * Handle reset action
+   * Resets tower selection when user resets the puzzle
+   * (Legacy method, now handled by event listener in main.js)
+   */
   handleReset() {
     this.selectedTower = -1;
   }
