@@ -96,7 +96,7 @@ This framework allows you to easily add new puzzles to the system. Each puzzle c
    <script src="mypuzzle-renderer.js"></script>
    <script src="../solver.js"></script>
    <script src="../graph.js"></script>
-   <script src="../ui-controller.js"></script>
+   <script src="../ui.js"></script>
    <script src="main.js"></script>
    ```
 
@@ -160,7 +160,7 @@ See the existing implementations:
 ├── abstract-renderer.js    # Abstract renderer class
 ├── solver.js               # BFS solver
 ├── graph.js                # Graph visualization
-├── ui-controller.js        # Common UI controller
+├── ui.js                   # Common UI controller
 ├── index.html              # Main puzzle list page
 │
 └── your-puzzle/            # Your puzzle directory
@@ -180,7 +180,7 @@ See the existing implementations:
 4. `your-puzzle-renderer.js` - Your renderer implementation
 5. `solver.js` - Solver algorithm
 6. `graph.js` - Graph visualization
-7. `ui-controller.js` - **Must come before main.js**
+7. `ui.js` - **Must come before main.js**
 8. `main.js` - Your puzzle initialization
 
 ## Tips
@@ -190,6 +190,6 @@ See the existing implementations:
 3. **Hash Function**: Ensure different states have different hashes
 4. **Color Coding**: Use meaningful colors for visualization
 5. **Click Handling**: Support both direct moves and 2-click selection
-6. **Keep main.js Minimal**: All common UI logic is in ui-controller.js - only add puzzle-specific handlers in main.js
+6. **Keep main.js Minimal**: All common UI logic is in ui.js - only add puzzle-specific handlers in main.js
 
 The framework handles all the complex parts (BFS solving, graph physics, UI controls) - you just focus on your puzzle's unique logic!
